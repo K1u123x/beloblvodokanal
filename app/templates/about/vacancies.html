@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Вакансии{% endblock %}
+{% block content %}
+
+<div class="mb-3">
+    <button onclick="history.back()" class="btn btn-outline-secondary rounded-pill">
+        <i class="bi bi-arrow-left"></i> Назад
+    </button>
+</div>
+
+<h2 class="fw-bold mb-4">Вакансии</h2>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">Слесарь АВР (аварийно-восстановительных работ)</h5>
+                <p class="text-muted"><i class="bi bi-geo-alt"></i> г. Белгород</p>
+                <p class="card-text">Требуется опытный специалист для работы в бригаде. Опыт работы от 1 года.</p>
+                <p><strong>Зарплата:</strong> от 45 000 ₽</p>
+                <a href="#" class="btn btn-primary rounded-pill">Откликнуться</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">Электрогазосварщик</h5>
+                <p class="text-muted"><i class="bi bi-geo-alt"></i> г. Белгород</p>
+                <p class="card-text">Работа на объектах водоканала. Наличие удостоверения обязательно.</p>
+                <p><strong>Зарплата:</strong> от 55 000 ₽</p>
+                <a href="#" class="btn btn-primary rounded-pill">Откликнуться</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">Мастер участка водопроводных сетей</h5>
+                <p class="text-muted"><i class="bi bi-geo-alt"></i> г. Белгород</p>
+                <p class="card-text">Организация работы бригады, контроль качества. Опыт от 3 лет.</p>
+                <p><strong>Зарплата:</strong> от 60 000 ₽</p>
+                <a href="#" class="btn btn-primary rounded-pill">Откликнуться</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">Инженер-технолог очистных сооружений</h5>
+                <p class="text-muted"><i class="bi bi-geo-alt"></i> г. Белгород</p>
+                <p class="card-text">Высшее профильное образование, знание технологических процессов.</p>
+                <p><strong>Зарплата:</strong> от 50 000 ₽</p>
+                <a href="#" class="btn btn-primary rounded-pill">Откликнуться</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

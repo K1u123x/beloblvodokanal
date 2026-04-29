@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Вход{% endblock %}
+{% block content %}
+<div class="mb-3">
+    <button onclick="history.back()" class="btn btn-outline-secondary rounded-pill">
+        <i class="bi bi-arrow-left"></i> Назад
+    </button>
+</div>
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h4>Вход в систему</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ form.email.label(class="form-label") }}
+                        {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else "")) }}
+                        {% for error in form.email.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.password.label(class="form-label") }}
+                        {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else "")) }}
+                        {% for error in form.password.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="mb-3 form-check">
+                        {{ form.remember(class="form-check-input") }}
+                        {{ form.remember.label(class="form-check-label") }}
+                    </div>
+                    <button type="submit" class="btn btn-primary">Войти</button>
+                    <div class="text-center mt-3">
+                        <a href="{{ url_for('auth.forgot_password') }}" class="text-decoration-none">
+                            <i class="bi bi-question-circle me-1"></i>Забыли пароль?
+                        </a>
+                    </div>
+                </form>
+                <hr>
+                <p>Нет аккаунта? <a href="{{ url_for('auth.register') }}">Зарегистрируйтесь</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

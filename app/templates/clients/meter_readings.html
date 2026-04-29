@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Передать показания{% endblock %}
+{% block content %}
+
+<div class="mb-3">
+    <button onclick="history.back()" class="btn btn-outline-secondary rounded-pill">
+        <i class="bi bi-arrow-left"></i> Назад
+    </button>
+</div>
+
+<h2 class="fw-bold mb-4">Передача показаний приборов учёта</h2>
+
+<div class="card">
+    <div class="card-body">
+        <p class="lead">Уважаемые абоненты! Передавать показания можно с 15 по 25 число каждого месяца.</p>
+        
+        <form>
+            <div class="mb-3">
+                <label class="form-label">Лицевой счёт</label>
+                <input type="text" class="form-control" placeholder="Введите номер лицевого счёта">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Показания холодной воды</label>
+                <input type="number" class="form-control" placeholder="Текущие показания">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Показания горячей воды</label>
+                <input type="number" class="form-control" placeholder="Текущие показания">
+            </div>
+            <button type="submit" class="btn btn-primary rounded-pill">Отправить показания</button>
+        </form>
+        
+        <hr>
+        <p class="text-muted">Также вы можете передать показания по телефону: <strong>+7 (4722) 23-02-23</strong></p>
+    </div>
+</div>
+{% endblock %}

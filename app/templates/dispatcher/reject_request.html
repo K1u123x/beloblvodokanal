@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Отклонение заявки{% endblock %}
+{% block content %}
+<div class="mb-3">
+    <button onclick="history.back()" class="btn btn-outline-secondary rounded-pill">
+        <i class="bi bi-arrow-left"></i> Назад
+    </button>
+</div>
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h4>Отклонение заявки №{{ request.id }}</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ form.reason.label(class="form-label") }}
+                        {{ form.reason(class="form-control", rows=4) }}
+                    </div>
+                    <button type="submit" class="btn btn-danger">Отклонить</button>
+                    <a href="{{ url_for('dispatcher.request_detail', request_id=request.id) }}" class="btn btn-secondary">Отмена</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

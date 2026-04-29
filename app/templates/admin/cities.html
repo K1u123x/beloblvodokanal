@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block title %}Управление городами{% endblock %}
+{% block content %}
+
+<div class="mb-3">
+    <button onclick="history.back()" class="btn btn-outline-secondary rounded-pill">
+        <i class="bi bi-arrow-left"></i> Назад
+    </button>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold">Города обслуживания</h2>
+    <a href="{{ url_for('admin.create_city') }}" class="btn btn-primary rounded-pill">
+        <i class="bi bi-plus-lg"></i> Добавить город
+    </a>
+</div>
+
+<!-- Фильтры -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <input type="text" id="citySearch" class="form-control rounded-pill" placeholder="🔍 Поиск по названию или региону...">
+            </div>
+            <div class="col-md-3">
+                <select id="statusFilter" class="form-select rounded-pill">
+                    <option value="all">Все города</option>
+                    <option value="active">Только активные</option>
+                    <option value="inactive">Только неактивные</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-outline-secondary rounded-pill w-100" id="resetFilters">
+                    <i class="bi bi-arrow-counterclockwise"></i> Сбросить
+                </button>
+            </div>
+            <div class="col-md-3 text-end">
+                <span class="text-muted" id="cityCount">Всего: {{ cities|length }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-hover align-middle mb-0" id="citiesTable">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Название</th>
+                    <th>Регион</th>
+                    <th>Статус</th>
+                    <th>Создан</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for city in cities %}
+                <tr data-status="{{ 'active' if city.is_active else 'inactive' }}">
+                    <td>{{ city.id }}</td>
+                    <td class="city-name">{{ city.name }}</td>
+                    <td>{{ city.region }}</td>
+                    <td>
+                        {% if city.is_active %}
+                        <span class="badge bg-success">Активен</span>
+                        {% else %}
+                        <span class="badge bg-secondary">Неактивен</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ city.created_at.strftime('%d.%m.%Y') }}</td>
+                    <td>
+                        <a href="{{ url_for('admin.edit_city', city_id=city.id) }}" class="btn btn-sm btn-outline-warning">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <a href="{{ url_for('admin.delete_city', city_id=city.id) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Удалить город?')">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    function filterTable() {
+        var searchText = $('#citySearch').val().toLowerCase();
+        var statusFilter = $('#statusFilter').val();
+        var visibleCount = 0;
+        
+        $('#citiesTable tbody tr').each(function() {
+            var row = $(this);
+            var name = row.find('.city-name').text().toLowerCase();
+            var region = row.find('td:eq(2)').text().toLowerCase();
+            var status = row.data('status');
+            
+            var matchesSearch = name.indexOf(searchText) > -1 || region.indexOf(searchText) > -1;
+            var matchesStatus = statusFilter === 'all' || status === statusFilter;
+            
+            if (matchesSearch && matchesStatus) {
+                row.show();
+                visibleCount++;
+            } else {
+                row.hide();
+            }
+        });
+        
+        $('#cityCount').text('Найдено: ' + visibleCount + ' из {{ cities|length }}');
+    }
+    
+    $('#citySearch').on('keyup', filterTable);
+    $('#statusFilter').on('change', filterTable);
+    
+    $('#resetFilters').click(function() {
+        $('#citySearch').val('');
+        $('#statusFilter').val('all');
+        filterTable();
+    });
+});
+</script>
+{% endblock %}

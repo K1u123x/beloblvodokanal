@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}Редактирование профиля{% endblock %}
+{% block content %}
+<div class="mb-3">
+    <button onclick="history.back()" class="btn btn-outline-secondary rounded-pill">
+        <i class="bi bi-arrow-left"></i> Назад
+    </button>
+</div>
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h4>Редактирование профиля</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            {{ form.last_name.label(class="form-label") }}
+                            {{ form.last_name(class="form-control" + (" is-invalid" if form.last_name.errors else "")) }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            {{ form.first_name.label(class="form-label") }}
+                            {{ form.first_name(class="form-control") }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            {{ form.patronymic.label(class="form-label") }}
+                            {{ form.patronymic(class="form-control") }}
+                        </div>
+                    </div>
+
+                    <!-- Email (только для просмотра) -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Email</label>
+                        <div class="d-flex align-items-center p-3 border rounded-3">
+                            <i class="bi bi-envelope-fill text-primary me-3 fs-5"></i>
+                            <span class="fw-medium">{{ current_user.email }}</span>
+                            <span class="ms-auto">
+                                <span class="badge border px-3 py-2 rounded-pill bg-success bg-opacity-10 text-success">
+                                    <i class="bi bi-check-circle-fill me-1"></i>Подтверждён
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Телефон -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Телефон</label>
+                        <div class="d-flex align-items-center p-3 border rounded-3">
+                            <i class="bi bi-phone-fill text-primary me-3 fs-5"></i>
+                            <div class="flex-grow-1">
+                                {{ form.phone(class="form-control-plaintext border-0 p-0 fw-medium",
+                                            style="font-size: 1rem; outline: none; background: transparent; color: inherit;") }}
+                            </div>
+                            <span class="ms-auto">
+                                <span class="badge border px-3 py-2 rounded-pill bg-success bg-opacity-10 text-success">
+                                    <i class="bi bi-check-circle-fill me-1"></i>Подтверждён
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Адрес -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.city_id.label(class="form-label") }}
+                            {{ form.city_id(class="form-select") }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.street.label(class="form-label") }}
+                            {{ form.street(class="form-control") }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.house.label(class="form-label") }}
+                            {{ form.house(class="form-control") }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.apartment.label(class="form-label") }}
+                            {{ form.apartment(class="form-control") }}
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                    <a href="{{ url_for('user.dashboard') }}" class="btn btn-secondary">Отмена</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

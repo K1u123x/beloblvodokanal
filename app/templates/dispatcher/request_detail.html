@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Заявка №{{ request.id }}{% endblock %}
+{% block content %}
+<div class="mb-3">
+    <button onclick="history.back()" class="btn btn-outline-secondary rounded-pill">
+        <i class="bi bi-arrow-left"></i> Назад
+    </button>
+</div>
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h4>Заявка №{{ request.id }}</h4>
+            </div>
+            <div class="card-body">
+                <p><strong>Услуга:</strong> {{ request.service.name }}</p>
+                <p><strong>Клиент:</strong> {{ request.client.user.full_name }} ({{ request.client.user.phone if request.client.user else '—' }})</p>
+                <p><strong>Email:</strong> {{ request.client.user.email if request.client.user else '—' }}</p>
+                <p><strong>Адрес:</strong> {{ request.full_address }}</p>
+                <p><strong>Описание:</strong> {{ request.description or 'нет' }}</p>
+                <p><strong>Дата:</strong> {{ request.scheduled_date.strftime('%d.%m.%Y') }}</p>
+                <p><strong>Время:</strong> {{ request.scheduled_time_start.strftime('%H:%M') }} - {{ request.scheduled_time_end.strftime('%H:%M') }}</p>
+                <p><strong>Статус:</strong> 
+                    <span class="badge bg-{{ request.status.color if request.status else 'secondary' }}">
+                        {{ request.status_ru }}
+                    </span>
+                </p>
+                {% if request.worker %}
+                <p>
+                    <strong>Работник:</strong> 
+                    <a href="{{ url_for('index.worker_profile', worker_id=request.worker.id) }}" target="_blank" class="text-decoration-none">
+                        {{ request.worker.full_name }} (рейтинг: {{ "%.1f"|format(request.worker.rating) }})
+                        <i class="bi bi-box-arrow-up-right ms-1 small"></i>
+                    </a>
+                </p>
+                {% endif %}
+                {% if request.dispatcher %}
+                <p><strong>Диспетчер:</strong> {{ request.dispatcher.full_name }}</p>
+                {% endif %}
+                {% if request.status and request.status.code == 'rejected' %}
+                <p><strong>Причина отклонения:</strong> {{ request.rejection_reason }}</p>
+                {% endif %}
+                <hr>
+                <div class="d-flex gap-2">
+                    {% if request.status and request.status.code == 'pending' %}
+                        <a href="{{ url_for('dispatcher.assign_worker', request_id=request.id) }}" class="btn btn-success">
+                            <i class="bi bi-person-check"></i> Назначить работника
+                        </a>
+                        <a href="{{ url_for('dispatcher.reject_request', request_id=request.id) }}" class="btn btn-danger">
+                            <i class="bi bi-x-circle"></i> Отклонить
+                        </a>
+                    {% endif %}
+                    {% if request.worker %}
+                        <a href="{{ url_for('dispatcher.chat', request_id=request.id) }}" class="btn btn-info">
+                            <i class="bi bi-chat-dots"></i> Чат
+                        </a>
+                    {% endif %}
+                    <a href="{{ url_for('dispatcher.requests_list', status=request.status.code if request.status else 'pending') }}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Назад к списку
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

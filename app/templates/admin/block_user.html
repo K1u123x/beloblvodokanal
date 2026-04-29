@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Блокировка пользователя{% endblock %}
+{% block content %}
+
+<div class="mb-3">
+    <button onclick="history.back()" class="btn btn-outline-secondary rounded-pill">
+        <i class="bi bi-arrow-left"></i> Назад
+    </button>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h4>
+                    {% if user.is_blocked %}
+                        <i class="bi bi-unlock me-2"></i>Разблокировать пользователя
+                    {% else %}
+                        <i class="bi bi-lock me-2"></i>Заблокировать пользователя
+                    {% endif %}
+                </h4>
+            </div>
+            <div class="card-body">
+                <p><strong>Пользователь:</strong> {{ user.full_name }} ({{ user.email }})</p>
+                <p><strong>Роль:</strong> {{ user.role.name }}</p>
+                
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Причина блокировки (необязательно)</label>
+                        <textarea name="block_reason" class="form-control" rows="3" 
+                                  placeholder="Например: нецензурная лексика, спам...">{{ user.block_reason or '' }}</textarea>
+                        <small class="text-muted">Пользователь увидит эту причину при попытке входа</small>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-{% if user.is_blocked %}success{% else %}danger{% endif %} rounded-pill px-4">
+                            {% if user.is_blocked %}
+                                <i class="bi bi-unlock me-1"></i> Разблокировать
+                            {% else %}
+                                <i class="bi bi-lock me-1"></i> Заблокировать
+                            {% endif %}
+                        </button>
+                        <a href="{{ url_for('admin.users') }}" class="btn btn-outline-secondary rounded-pill px-4">Отмена</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

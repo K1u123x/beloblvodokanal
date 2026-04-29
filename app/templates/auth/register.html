@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% block title %}Регистрация{% endblock %}
+{% block content %}
+<div class="mb-3">
+    <button onclick="history.back()" class="btn btn-outline-secondary rounded-pill">
+        <i class="bi bi-arrow-left"></i> Назад
+    </button>
+</div>
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h4>Регистрация</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            {{ form.last_name.label(class="form-label") }}
+                            {{ form.last_name(class="form-control" + (" is-invalid" if form.last_name.errors else "")) }}
+                            {% for error in form.last_name.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            {{ form.first_name.label(class="form-label") }}
+                            {{ form.first_name(class="form-control" + (" is-invalid" if form.first_name.errors else "")) }}
+                            {% for error in form.first_name.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            {{ form.patronymic.label(class="form-label") }}
+                            {{ form.patronymic(class="form-control") }}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        {{ form.email.label(class="form-label") }}
+                        {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else "")) }}
+                        {% for error in form.email.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                   <div class="mb-3">
+                        {{ form.phone.label(class="form-label") }}
+                        {{ form.phone(class="form-control", placeholder="+7 (999) 123-45-67", id="phone") }}
+                        <small class="text-muted">Формат: +7 (XXX) XXX-XX-XX</small>
+                        {% for error in form.phone.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Адрес -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.city_id.label(class="form-label") }}
+                            {{ form.city_id(class="form-select") }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.street.label(class="form-label") }}
+                            {{ form.street(class="form-control", placeholder="ул. Ленина") }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.house.label(class="form-label") }}
+                            {{ form.house(class="form-control", placeholder="д. 10") }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.apartment.label(class="form-label") }}
+                            {{ form.apartment(class="form-control", placeholder="кв. 25 (необязательно)") }}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                    <div class="col-md-6 mb-3">
+                        {{ form.password.label(class="form-label") }}
+                        <div class="input-group">
+                            {{ form.password(class="form-control", id="password") }}
+                            <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                        <div class="progress mt-2" style="height: 5px;">
+                            <div id="passwordStrength" class="progress-bar" style="width: 0%;"></div>
+                        </div>
+                        <small id="passwordHint" class="text-muted">Минимум 8 символов, цифры и буквы</small>
+                        {% for error in form.password.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.password2.label(class="form-label") }}
+                            {{ form.password2(class="form-control" + (" is-invalid" if form.password2.errors else "")) }}
+                            {% for error in form.password2.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
+                </form>
+                <hr>
+                <p>Уже есть аккаунт? <a href="{{ url_for('auth.login') }}">Войдите</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/jquery.maskedinput@1.4.1/src/jquery.maskedinput.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Маска для телефона
+    $("#phone").mask("+7 (999) 999-99-99");
+    
+    // Показать/скрыть пароль
+    $('#togglePassword').click(function() {
+        var passwordField = $('#password');
+        var icon = $(this).find('i');
+        if (passwordField.attr('type') === 'password') {
+            passwordField.attr('type', 'text');
+            icon.removeClass('bi-eye').addClass('bi-eye-slash');
+        } else {
+            passwordField.attr('type', 'password');
+            icon.removeClass('bi-eye-slash').addClass('bi-eye');
+        }
+    });
+    
+    // Индикатор сложности пароля
+    $('#password').on('input', function() {
+        var password = $(this).val();
+        var strength = 0;
+        var hint = '';
+        var barClass = 'bg-danger';
+        
+        if (password.length >= 8) strength += 25;
+        if (password.match(/[0-9]/)) strength += 25;
+        if (password.match(/[a-z]/) || password.match(/[A-Z]/) || password.match(/[а-я]/i)) strength += 25;
+        if (password.match(/[^a-zA-Z0-9а-яА-Я]/)) strength += 25;
+        
+        if (strength <= 25) {
+            barClass = 'bg-danger';
+            hint = 'Слабый пароль';
+        } else if (strength <= 50) {
+            barClass = 'bg-warning';
+            hint = 'Средний пароль';
+        } else if (strength <= 75) {
+            barClass = 'bg-info';
+            hint = 'Хороший пароль';
+        } else {
+            barClass = 'bg-success';
+            hint = 'Надёжный пароль';
+        }
+        
+        $('#passwordStrength').css('width', strength + '%').removeClass('bg-danger bg-warning bg-info bg-success').addClass(barClass);
+        $('#passwordHint').text(hint || 'Минимум 8 символов, цифры и буквы');
+    });
+});
+</script>
+{% endblock %}

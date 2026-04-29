@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% block title %}Панель диспетчера{% endblock %}
+{% block content %}
+
+<div class="mb-3">
+    <button onclick="history.back()" class="btn btn-outline-secondary rounded-pill">
+        <i class="bi bi-arrow-left"></i> Назад
+    </button>
+</div>
+
+<h2 class="fw-bold mb-4"><i class="bi bi-speedometer2 me-2"></i>Панель диспетчера</h2>
+
+<!-- Статистика -->
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card bg-warning bg-opacity-10 border-warning h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-warning text-uppercase small fw-bold mb-2">Ожидают назначения</h6>
+                        <h2 class="display-5 fw-bold mb-0">{{ pending|length }}</h2>
+                    </div>
+                    <div class="bg-warning bg-opacity-25 d-flex align-items-center justify-content-center" 
+                         style="width: 64px; height: 64px; min-width: 64px; min-height: 64px; aspect-ratio: 1/1; flex-shrink: 0; border-radius: 50%;">
+                        <i class="bi bi-clock-history fs-3 text-warning"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card bg-info bg-opacity-10 border-info h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-info text-uppercase small fw-bold mb-2">Активные заявки</h6>
+                        <h2 class="display-5 fw-bold mb-0">{{ active|length }}</h2>
+                    </div>
+                    <div class="bg-info bg-opacity-25 d-flex align-items-center justify-content-center" 
+                         style="width: 64px; height: 64px; min-width: 64px; min-height: 64px; aspect-ratio: 1/1; flex-shrink: 0; border-radius: 50%;">
+                        <i class="bi bi-play-circle fs-3 text-info"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Последние 3 ожидающие заявки -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-warning bg-opacity-25 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="bi bi-clock-history me-2"></i>Ожидают назначения
+                </h5>
+                <a href="{{ url_for('dispatcher.requests_list', status='pending') }}" class="btn btn-sm btn-outline-warning rounded-pill">
+                    Все <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+            <div class="card-body p-0">
+                {% if pending %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>№</th>
+                                <th>Услуга</th>
+                                <th>Город</th>
+                                <th>Адрес</th>
+                                <th>Дата</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for req in pending[:3] %}
+                            <tr class="clickable-row" data-href="{{ url_for('dispatcher.request_detail', request_id=req.id) }}" style="cursor: pointer;">
+                                <td><span class="badge bg-secondary">#{{ req.id }}</span></td>
+                                <td>{{ req.service.name|truncate(20) }}</td>
+                                <td>{{ req.city.name if req.city else '—' }}</td>
+                                <td>{{ req.street }}, д.{{ req.house }}</td>
+                                <td>{{ req.scheduled_date.strftime('%d.%m.%Y') if req.scheduled_date else '—' }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <span style="font-size: 2.5rem;">✅</span>
+                    <p class="text-muted mt-2 mb-0">Нет ожидающих заявок</p>
+                </div>
+                {% endif %}
+            </div>
+            {% if pending|length > 3 %}
+            <div class="card-footer bg-transparent text-center py-2">
+                <small class="text-muted">Показано 3 из {{ pending|length }} заявок</small>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Последние 3 активные заявки -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-info bg-opacity-25 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="bi bi-play-circle me-2"></i>Активные заявки
+                </h5>
+                <a href="{{ url_for('dispatcher.requests_list', status='assigned') }}" class="btn btn-sm btn-outline-info rounded-pill">
+                    Все <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+            <div class="card-body p-0">
+                {% if active %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>№</th>
+                                <th>Услуга</th>
+                                <th>Город</th>
+                                <th>Работник</th>
+                                <th>Статус</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for req in active[:3] %}
+                            <tr class="clickable-row" data-href="{{ url_for('dispatcher.request_detail', request_id=req.id) }}" style="cursor: pointer;">
+                                <td><span class="badge bg-secondary">#{{ req.id }}</span></td>
+                                <td>{{ req.service.name|truncate(20) }}</td>
+                                <td>{{ req.city.name if req.city else '—' }}</td>
+                                <td>
+                                    {% if req.worker %}
+                                    <a href="{{ url_for('index.worker_profile', worker_id=req.worker.id) }}" target="_blank" class="text-decoration-none">
+                                        {{ req.worker.full_name|truncate(15) }}
+                                        <i class="bi bi-box-arrow-up-right ms-1 small"></i>
+                                    </a>
+                                    {% else %}
+                                    —
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-{{ req.status.color if req.status else 'secondary' }}">
+                                        {{ req.status_ru }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <span style="font-size: 2.5rem;">✅</span>
+                    <p class="text-muted mt-2 mb-0">Нет активных заявок</p>
+                </div>
+                {% endif %}
+            </div>
+            {% if active|length > 3 %}
+            <div class="card-footer bg-transparent text-center py-2">
+                <small class="text-muted">Показано 3 из {{ active|length }} заявок</small>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    $('.clickable-row').click(function() {
+        window.location.href = $(this).data('href');
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block title %}Чат по заявке №{{ request.id }}{% endblock %}
+{% block content %}
+
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="chat-container">
+            <!-- Заголовок чата -->
+            <div class="chat-header d-flex align-items-center">
+                <a href="{{ url_for('user.request_detail', request_id=request.id) }}" class="btn btn-sm me-3" style="background: rgba(255,255,255,0.15); color: white; border-radius: 50%; width: 36px; height: 36px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+                <div>
+                    <h5 class="mb-0 fw-bold">Чат по заявке №{{ request.id }}</h5>
+                    <small>{{ request.service.name }} · 
+                        {% if request.worker %}
+                            {{ request.worker.full_name }}
+                        {% else %}
+                            Ожидает назначения
+                        {% endif %}
+                    </small>
+                </div>
+            </div>
+            
+            <!-- Сообщения -->
+            <div class="chat-messages" id="chat-box">
+                {% if messages %}
+                    {% for msg in messages %}
+                        {% set is_outgoing = msg.author_id == current_user.id %}
+                        {% set author = msg.author %}
+                        {% set role_code = author.role.code if author.role else 'client' %}
+                        
+                        <div class="message-wrapper {% if is_outgoing %}outgoing{% endif %}" data-msg-id="{{ msg.id }}">
+                            <!-- Аватарка -->
+                            <div class="message-avatar avatar-{{ role_code }}">
+                                {{ author.last_name[0] }}{{ author.first_name[0] }}
+                                <span class="role-badge" title="{{ author.role.name if author.role else 'Клиент' }}">
+                                    {{ role_code[0]|upper }}
+                                </span>
+                            </div>
+                            
+                            <!-- Содержимое сообщения -->
+                            <div class="message-content">
+                                <div class="message-header">
+                                    <span class="message-author">{{ author.full_name }}</span>
+                                    <span class="message-role-tag">
+                                        {{ author.role.name if author.role else 'Клиент' }}
+                                    </span>
+                                </div>
+                                <div class="message-text">
+                                    {{ msg.content }}
+                                </div>
+                                <div class="message-footer">
+                                    <span class="message-time">
+                                        <i class="bi bi-clock me-1"></i>{{ msg.timestamp.strftime('%H:%M') }}
+                                    </span>
+                                    {% if is_outgoing %}
+                                    <span class="message-status">
+                                        <i class="bi bi-check-all"></i>
+                                    </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="chat-empty">
+                        <i class="bi bi-chat-dots"></i>
+                        <p>Нет сообщений</p>
+                        <small>Напишите первое сообщение</small>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Поле ввода -->
+            <div class="chat-footer">
+                <form method="POST" id="messageForm">
+                    {{ form.hidden_tag() }}
+                    <div class="input-group">
+                        {{ form.content(class="form-control", placeholder="Введите сообщение...", rows=1, id="messageInput") }}
+                        <button class="btn btn-primary" type="submit" id="sendBtn">
+                            <i class="bi bi-send-fill"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    var chatBox = $('#chat-box');
+    var messageForm = $('#messageForm');
+    var messageInput = $('#messageInput');
+    var sendBtn = $('#sendBtn');
+    var currentUserId = $('body').data('user-id');
+    
+    // Скролл вниз при загрузке
+    chatBox.scrollTop(chatBox[0].scrollHeight);
+    
+    // Отправка по Enter, Shift+Enter — перенос строки
+    messageInput.keydown(function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            messageForm.submit();
+        }
+    });
+    
+    // Отправка сообщения
+    messageForm.on('submit', function(e) {
+        e.preventDefault();
+        
+        var message = messageInput.val().trim();
+        if (message === '') return;
+        
+        sendBtn.prop('disabled', true).html('<i class="bi bi-hourglass-split"></i>');
+        
+        $.ajax({
+            type: 'POST',
+            url: window.location.href,
+            data: messageForm.serialize(),
+            success: function(response) {
+                messageInput.val('');
+                messageInput.focus();
+                
+                // Перезагружаем сообщения
+                $.get(window.location.href, function(html) {
+                    var newChatBox = $(html).find('#chat-box');
+                    if (newChatBox.length) {
+                        chatBox.html(newChatBox.html());
+                        chatBox.scrollTop(chatBox[0].scrollHeight);
+                    }
+                });
+            },
+            error: function() {
+                alert('Ошибка при отправке сообщения. Попробуйте снова.');
+            },
+            complete: function() {
+                sendBtn.prop('disabled', false).html('<i class="bi bi-send-fill"></i>');
+            }
+        });
+    });
+    
+    // Автообновление каждые 5 секунд
+    setInterval(function() {
+        $.get(window.location.href, function(html) {
+            var newMessages = $(html).find('.message-wrapper');
+            var currentCount = $('.message-wrapper').length;
+            
+            if (newMessages.length > currentCount) {
+                chatBox.html($(html).find('#chat-box').html());
+                chatBox.scrollTop(chatBox[0].scrollHeight);
+            }
+        });
+    }, 5000);
+});
+</script>
+{% endblock %}

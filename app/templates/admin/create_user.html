@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}Создание пользователя{% endblock %}
+{% block content %}
+<div class="mb-3">
+    <button onclick="history.back()" class="btn btn-outline-secondary rounded-pill">
+        <i class="bi bi-arrow-left"></i> Назад
+    </button>
+</div>
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h4>Создание нового пользователя</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            {{ form.last_name.label(class="form-label") }}
+                            {{ form.last_name(class="form-control") }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            {{ form.first_name.label(class="form-label") }}
+                            {{ form.first_name(class="form-control") }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            {{ form.patronymic.label(class="form-label") }}
+                            {{ form.patronymic(class="form-control") }}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        {{ form.email.label(class="form-label") }}
+                        {{ form.email(class="form-control") }}
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.phone.label(class="form-label") }}
+                            {{ form.phone(class="form-control") }}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        {{ form.password.label(class="form-label") }}
+                        {{ form.password(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.role_id.label(class="form-label") }}
+                        {{ form.role_id(class="form-select", id="roleSelect") }}
+                    </div>
+                    
+                    <!-- Блок для клиента (адрес) -->
+                    <div id="clientFields" style="display: none;">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.city_id.label(class="form-label") }}
+                                {{ form.city_id(class="form-select") }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form.street.label(class="form-label") }}
+                                {{ form.street(class="form-control") }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.house.label(class="form-label") }}
+                                {{ form.house(class="form-control") }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form.apartment.label(class="form-label") }}
+                                {{ form.apartment(class="form-control") }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Блок для работника (услуги) -->
+                    <div class="mb-3" id="workerFields" style="display: none;">
+                        {{ form.services.label(class="form-label") }}
+                        {{ form.services(class="form-select", size=5, multiple=True) }}
+                        <small class="text-muted">Удерживайте Ctrl для выбора нескольких</small>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Создать</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+document.getElementById('roleSelect').addEventListener('change', function() {
+    var selectedText = this.options[this.selectedIndex].text.toLowerCase();
+    var clientFields = document.getElementById('clientFields');
+    var workerFields = document.getElementById('workerFields');
+    
+    // Скрываем оба блока
+    clientFields.style.display = 'none';
+    workerFields.style.display = 'none';
+    
+    // Показываем нужный блок
+    if (selectedText.includes('клиент')) {
+        clientFields.style.display = 'block';
+    } else if (selectedText.includes('работник')) {
+        workerFields.style.display = 'block';
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Тарифы{% endblock %}
+{% block content %}
+
+<div class="mb-3">
+    <button onclick="history.back()" class="btn btn-outline-secondary rounded-pill">
+        <i class="bi bi-arrow-left"></i> Назад
+    </button>
+</div>
+
+<h2 class="fw-bold mb-4">Тарифы на услуги водоснабжения и водоотведения</h2>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <h5>Для населения (с НДС)</h5>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Услуга</th>
+                    <th>Тариф, руб./м³</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Холодное водоснабжение</td>
+                    <td>32,50</td>
+                </tr>
+                <tr>
+                    <td>Водоотведение</td>
+                    <td>28,40</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <h5>Для юридических лиц (без НДС)</h5>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Услуга</th>
+                    <th>Тариф, руб./м³</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Холодное водоснабжение</td>
+                    <td>27,80</td>
+                </tr>
+                <tr>
+                    <td>Водоотведение</td>
+                    <td>24,60</td>
+                </tr>
+            </tbody>
+        </table>
+        <p class="text-muted mt-3">Тарифы действуют с 1 января 2026 года.</p>
+    </div>
+</div>
+{% endblock %}

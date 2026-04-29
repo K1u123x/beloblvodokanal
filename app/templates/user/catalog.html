@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% block title %}Каталог услуг{% endblock %}
+{% block content %}
+<div class="mb-3">
+    <button onclick="history.back()" class="btn btn-outline-secondary rounded-pill">
+        <i class="bi bi-arrow-left"></i> Назад
+    </button>
+</div>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold">Каталог услуг</h2>
+    
+    <!-- Блок поиска -->
+    <div class="position-relative" style="width: 300px;">
+        <input type="text" id="serviceSearch" class="form-control rounded-pill" 
+               placeholder="🔍 Поиск по названию или описанию..." autocomplete="off">
+        <div id="searchDropdown" class="dropdown-menu w-100 mt-2 p-2 shadow" 
+             style="display: none; max-height: 300px; overflow-y: auto;"></div>
+    </div>
+</div>
+
+<!-- Контейнер с карточками услуг -->
+<div class="row g-4" id="servicesContainer">
+    {% for service in services %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 service-card" 
+             data-service-name="{{ service.name|lower }}" 
+             data-service-description="{{ service.description|lower }}">
+            <div class="card-body d-flex flex-column p-4">
+                <div class="mb-3">
+                    <i class="bi {{ service.icon if service.icon else 'bi-droplet-half' }} fs-1 text-primary"></i>
+                </div>
+                <h5 class="card-title fw-bold">{{ service.name }}</h5>
+                <div class="card-text flex-grow-1">
+                    <p class="service-description-short mb-0" style="cursor: pointer;">
+                        {{ service.description|truncate(60) }}
+                        {% if service.description|length > 60 %}
+                            <span class="text-primary">… ещё</span>
+                        {% endif %}
+                    </p>
+                    <p class="service-description-full d-none" style="cursor: pointer;">
+                        {{ service.description }}
+                        <span class="text-primary"> (свернуть)</span>
+                    </p>
+                </div>
+                <div class="mt-3 d-flex justify-content-between align-items-center">
+                    <span class="h5 fw-bold text-primary">{{ service.price }} ₽</span>
+                    <span class="badge bg-light text-dark">
+                        <i class="bi bi-clock"></i> {{ service.duration }} мин
+                    </span>
+                </div>
+                <a href="{{ url_for('user.book', service_id=service.id) }}" 
+                   class="btn btn-outline-primary rounded-pill mt-3">Забронировать</a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12 text-center py-5">
+        <span style="font-size: 4rem;">🔍</span>
+        <h4 class="mt-3">Ничего не найдено</h4>
+        <p class="text-muted">Попробуйте изменить поисковый запрос</p>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function(){
+    var $services = $('.service-card');
+    var $dropdown = $('#searchDropdown');
+    var $searchInput = $('#serviceSearch');
+
+    $searchInput.on('input', function(){
+        var val = $(this).val().toLowerCase().trim();
+        
+        if(val.length === 0) {
+            $dropdown.hide();
+            $services.closest('.col-md-6').show();
+            return;
+        }
+        
+        var matches = [];
+        $services.each(function(){
+            var $card = $(this);
+            var name = $card.data('service-name');
+            var description = $card.data('service-description');
+            
+            if(name.indexOf(val) !== -1 || description.indexOf(val) !== -1) {
+                matches.push({
+                    name: $card.find('.card-title').text(),
+                    card: $card
+                });
+            }
+        });
+        
+        $services.closest('.col-md-6').hide();
+        $.each(matches, function(i, match){
+            match.card.closest('.col-md-6').show();
+        });
+        
+        $dropdown.empty();
+        if(matches.length > 0) {
+            $.each(matches.slice(0, 5), function(i, match){
+                var $item = $('<a class="dropdown-item" href="#">' + match.name + '</a>');
+                $item.click(function(e){
+                    e.preventDefault();
+                    $searchInput.val(match.name);
+                    $services.closest('.col-md-6').hide();
+                    match.card.closest('.col-md-6').show();
+                    $dropdown.hide();
+                });
+                $dropdown.append($item);
+            });
+            $dropdown.show();
+        } else {
+            $dropdown.hide();
+        }
+    });
+    
+    $(document).click(function(e){
+        if(!$(e.target).closest('#serviceSearch, #searchDropdown').length) {
+            $dropdown.hide();
+        }
+    });
+    
+    $searchInput.on('focus', function(){
+        if($(this).val().length > 0) {
+            $dropdown.show();
+        }
+    });
+
+    // Раскрытие описания услуги
+    $(document).on('click', '.service-description-short', function() {
+        $(this).addClass('d-none');
+        $(this).siblings('.service-description-full').removeClass('d-none');
+    });
+
+    $(document).on('click', '.service-description-full', function() {
+        $(this).addClass('d-none');
+        $(this).siblings('.service-description-short').removeClass('d-none');
+    });
+});
+</script>
+{% endblock %}

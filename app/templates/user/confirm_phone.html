@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Подтверждение телефона{% endblock %}
+{% block content %}
+
+<div class="mb-3">
+    <button onclick="history.back()" class="btn btn-outline-secondary rounded-pill">
+        <i class="bi bi-arrow-left"></i> Назад
+    </button>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="bi bi-phone me-2"></i>Подтверждение телефона</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle-fill me-2"></i>
+                    На номер <strong>{{ current_user.phone }}</strong> отправлен код подтверждения.<br>
+                    <small>Проверьте консоль сервера — код выведен там.</small>
+                </div>
+                
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ form.code.label(class="form-label fw-bold") }}
+                        {{ form.code(class="form-control text-center", placeholder="Введите 6-значный код", maxlength="6", style="font-size: 1.5rem; letter-spacing: 5px;") }}
+                        {% for error in form.code.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <button type="submit" class="btn btn-primary rounded-pill w-100">
+                        <i class="bi bi-check-lg me-2"></i>Подтвердить
+                    </button>
+                </form>
+                
+                <hr>
+                <p class="text-center">
+                    Не получили код?<br>
+                    <a href="{{ url_for('user.send_phone_code') }}" class="btn btn-outline-secondary rounded-pill mt-2">
+                        <i class="bi bi-arrow-repeat me-1"></i>Отправить повторно
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

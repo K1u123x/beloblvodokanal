@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Личный кабинет{% endblock %}
+{% block content %}
+<h2>Личный кабинет</h2>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Профиль</h5>
+                <p><strong>ФИО:</strong> {{ current_user.full_name }}</p>
+                <p><strong>Email:</strong> {{ current_user.email }}</p>
+                <p><strong>Телефон:</strong> {{ current_user.phone or 'не указан' }}</p>
+                <p><strong>Адрес:</strong> {{ current_user.client_profile.full_address if current_user.client_profile else 'не указан' }}</p>
+                <a href="{{ url_for('user.profile') }}" class="btn btn-sm btn-primary">Редактировать</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Последние заявки</h5>
+            </div>
+            <div class="card-body">
+                {% if requests %}
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>№</th>
+                            <th>Услуга</th>
+                            <th>Дата</th>
+                            <th>Время</th>
+                            <th>Статус</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for req in requests[:5] %}
+                        <tr>
+                            <td>{{ req.id }}</td>
+                            <td>{{ req.service.name }}</td>
+                            <td>{{ req.scheduled_date }}</td>
+                            <td>{{ req.scheduled_time_start.strftime('%H:%M') }}</td>
+                            <td>{{ req.status_ru }}</td>
+                            <td><a href="{{ url_for('user.request_detail', request_id=req.id) }}" class="btn btn-sm btn-info">Подробнее</a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <a href="{{ url_for('user.my_requests') }}" class="btn btn-primary">Все заявки</a>
+                {% else %}
+                <p>У вас пока нет заявок.</p>
+                <a href="{{ url_for('user.catalog') }}" class="btn btn-success">Забронировать услугу</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

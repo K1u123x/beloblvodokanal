@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% block title %}Оставить отзыв{% endblock %}
+
+{% block extra_css %}
+<style>
+    .star-rating {
+        display: flex;
+        gap: 10px;
+        font-size: 2.5rem;
+        cursor: pointer;
+        margin-bottom: 1.5rem;
+    }
+    .star-rating .star {
+        color: #ccc;
+        transition: all 0.15s ease;
+    }
+    .star-rating .star:hover,
+    .star-rating .star.active {
+        color: #ffc107;
+        transform: scale(1.15);
+    }
+    .star-rating .star.selected {
+        color: #ffc107;
+    }
+    .rating-text {
+        margin-left: 15px;
+        font-size: 1.2rem;
+        color: var(--text-muted);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="mb-3">
+    <button onclick="history.back()" class="btn btn-outline-secondary rounded-pill">
+        <i class="bi bi-arrow-left"></i> Назад
+    </button>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="bi bi-star me-2"></i>Оставить отзыв по заявке №{{ request.id }}</h4>
+            </div>
+            <div class="card-body">
+                <!-- Информация о заявке -->
+                <div class="alert alert-light border mb-4">
+                    <strong>Услуга:</strong> {{ request.service.name }}<br>
+                    <strong>Исполнитель:</strong> {{ request.worker.full_name }}<br>
+                    <strong>Дата выполнения:</strong> {{ request.completed_at.strftime('%d.%m.%Y %H:%M') if request.completed_at else request.scheduled_date.strftime('%d.%m.%Y') }}
+                </div>
+
+                <form method="POST" enctype="multipart/form-data" id="reviewForm">
+                    {{ form.hidden_tag() }}
+                    
+                    <!-- Скрытое поле для рейтинга -->
+                    <input type="hidden" name="rating" id="ratingInput" value="{{ form.rating.data or '5' }}">
+                    
+                    <!-- Интерактивные звёзды -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Ваша оценка</label>
+                        <div class="star-rating" id="starRating">
+                            <span class="star" data-value="1">★</span>
+                            <span class="star" data-value="2">★</span>
+                            <span class="star" data-value="3">★</span>
+                            <span class="star" data-value="4">★</span>
+                            <span class="star" data-value="5">★</span>
+                            <span class="rating-text" id="ratingText">Отлично!</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.comment.label(class="form-label fw-bold") }}
+                        {{ form.comment(class="form-control", rows=4, placeholder="Расскажите о ваших впечатлениях...") }}
+                    </div>
+        
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-camera me-1"></i>Фото результата
+                            <span class="text-muted fw-normal">(необязательно)</span>
+                        </label>
+                        {{ form.photo(class="form-control", accept="image/*") }}
+                        <small class="text-muted">JPG, PNG, JPEG. Макс. 16 МБ</small>
+                        <div class="mt-2" id="photoPreviewContainer" style="display: none;">
+                            <img id="photoPreview" src="#" alt="Предпросмотр" style="max-height: 150px; max-width: 100%;" class="rounded border">
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary rounded-pill px-4">
+                            <i class="bi bi-send me-1"></i> Отправить отзыв
+                        </button>
+                        <a href="{{ url_for('user.request_detail', request_id=request.id) }}" 
+                           class="btn btn-outline-secondary rounded-pill px-4">
+                            <i class="bi bi-x-lg me-1"></i> Отмена
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    var stars = $('.star');
+    var ratingInput = $('#ratingInput');
+    var ratingText = $('#ratingText');
+    
+    var ratingMessages = {
+        1: 'Очень плохо',
+        2: 'Плохо',
+        3: 'Нормально',
+        4: 'Хорошо',
+        5: 'Отлично!'
+    };
+    
+    // Установка начального значения (по умолчанию 5)
+    var initialRating = parseInt(ratingInput.val()) || 5;
+    highlightStars(initialRating);
+    ratingText.text(ratingMessages[initialRating]);
+    
+    // При наведении
+    stars.hover(
+        function() {
+            var value = $(this).data('value');
+            highlightStars(value);
+            ratingText.text(ratingMessages[value]);
+        },
+        function() {
+            var currentRating = parseInt(ratingInput.val()) || 5;
+            highlightStars(currentRating);
+            ratingText.text(ratingMessages[currentRating]);
+        }
+    );
+    
+    // При клике
+    stars.click(function() {
+        var value = $(this).data('value');
+        ratingInput.val(value);
+        highlightStars(value);
+        ratingText.text(ratingMessages[value]);
+        
+        // Добавляем анимацию
+        $(this).addClass('active');
+        setTimeout(() => $(this).removeClass('active'), 200);
+    });
+    
+    function highlightStars(count) {
+        stars.each(function(index) {
+            if (index < count) {
+                $(this).addClass('selected');
+            } else {
+                $(this).removeClass('selected');
+            }
+        });
+    }
+});
+
+    $('#photo').change(function() {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                $('#photoPreview').attr('src', e.target.result);
+                $('#photoPreviewContainer').show();
+            }
+            reader.readAsDataURL(file);
+        } else {
+            $('#photoPreviewContainer').hide();
+        }
+    });
+</script>
+{% endblock %}

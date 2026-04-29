@@ -1,0 +1,545 @@
+/* Темы оформления */
+:root {
+  --bg-color: #f4f7fc;
+  --text-color: #212529;
+  --card-bg: #ffffff;
+  --border-color: #dee2e6;
+  --navbar-bg: linear-gradient(135deg, #003d7a 0%, #0054a6 100%);
+  --footer-bg: linear-gradient(145deg, #0b1e33 0%, #0a1622 100%);
+  --footer-text: #e2e8f0;
+  --top-bar-bg: linear-gradient(145deg, #f8fafc 0%, #ffffff 100%);
+  --top-bar-text: #1e293b;
+  --dropdown-bg: #ffffff;
+  --dropdown-text: #212529;
+  --dropdown-hover-bg: #f1f5f9;
+  --chat-message-in: #ffffff;
+  --chat-message-out: #0054a6;
+  --chat-bg: #fafbfc;
+  --input-bg: #ffffff;
+  --input-text: #212529;
+  --muted-text: #6c757d;
+  --badge-bg: #f1f5f9;
+  --badge-text: #1e293b;
+  --progress-bg: #e9ecef;
+  --hero-bg: linear-gradient(145deg, #e6f2ff 0%, #ffffff 100%);
+  --hero-text: #212529;
+  --hero-subtext: #6c757d;
+}
+
+[data-theme="dark"] {
+  --bg-color: #1a1e24;
+  --text-color: #e9ecef;
+  --card-bg: #2c3138;
+  --border-color: #444a52;
+  --navbar-bg: #1a1e24;
+  --footer-bg: #15191f;
+  --footer-text: #b0b8c4;
+  --top-bar-bg: #2c3138;
+  --top-bar-text: #e9ecef;
+  --dropdown-bg: #2c3138;
+  --dropdown-text: #e9ecef;
+  --dropdown-hover-bg: #3a4048;
+  --chat-message-in: #3a4048;
+  --chat-message-out: #0054a6;
+  --chat-bg: #22272e;
+  --input-bg: #2c3138;
+  --input-text: #e9ecef;
+  --muted-text: #a0aec0;
+  --badge-bg: #3a4048;
+  --badge-text: #e9ecef;
+  --progress-bg: #3a4048;
+  --hero-bg: linear-gradient(145deg, #1a2b3c 0%, #1a1e24 100%);
+  --hero-text: #e9ecef;
+  --hero-subtext: #a0aec0;
+}
+
+[data-theme="high-contrast"] {
+  --bg-color: #000000;
+  --text-color: #ffff00;
+  --card-bg: #000000;
+  --border-color: #ffff00;
+  --navbar-bg: #000000;
+  --footer-bg: #000000;
+  --footer-text: #ffff00;
+  --top-bar-bg: #000000;
+  --top-bar-text: #ffff00;
+  --dropdown-bg: #000000;
+  --dropdown-text: #ffff00;
+  --dropdown-hover-bg: #333333;
+  --chat-message-in: #000000;
+  --chat-message-out: #0000ff;
+  --chat-bg: #000000;
+  --input-bg: #000000;
+  --input-text: #ffff00;
+  --muted-text: #ffff00;
+  --badge-bg: #000000;
+  --badge-text: #ffff00;
+  --progress-bg: #333333;
+  --hero-bg: #000000;
+  --hero-text: #ffff00;
+  --hero-subtext: #ffff00;
+}
+
+/* Применение переменных */
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* Верхняя панель */
+.top-bar {
+  background: var(--top-bar-bg) !important;
+  color: var(--top-bar-text) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+}
+
+.top-bar i {
+  color: var(--primary, #0054a6) !important;
+}
+
+/* Карточки и контейнеры */
+.card, 
+.table, 
+.modal-content, 
+.list-group-item, 
+.dropdown-menu,
+.chat-container,
+.toast {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+
+/* Выпадающее меню */
+.dropdown-menu {
+  background-color: var(--dropdown-bg) !important;
+}
+
+.dropdown-item {
+  color: var(--dropdown-text) !important;
+}
+
+.dropdown-item:hover {
+  background-color: var(--dropdown-hover-bg) !important;
+  color: var(--dropdown-text) !important;
+}
+
+.dropdown-divider {
+  border-top-color: var(--border-color) !important;
+}
+
+/* Навбар */
+.navbar {
+  background: var(--navbar-bg) !important;
+}
+
+/* Футер */
+.footer {
+  background: var(--footer-bg) !important;
+  color: var(--footer-text) !important;
+}
+
+.footer a {
+  color: var(--footer-text) !important;
+  opacity: 0.8;
+}
+
+.footer a:hover {
+  opacity: 1;
+}
+
+.footer .bi {
+  color: var(--primary-light, #00aeef) !important;
+}
+
+.footer hr {
+  border-top-color: var(--border-color) !important;
+}
+
+/* Таблицы */
+.table {
+  color: var(--text-color);
+}
+
+.table thead th {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  border-bottom: 2px solid var(--border-color);
+}
+
+.table tbody td {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: var(--card-bg);
+  opacity: 0.95;
+}
+
+/* Формы */
+.form-control, 
+.form-select {
+  background-color: var(--input-bg);
+  color: var(--input-text);
+  border-color: var(--border-color);
+}
+
+.form-control:focus, 
+.form-select:focus {
+  background-color: var(--input-bg);
+  color: var(--input-text);
+}
+
+.form-control::placeholder {
+  color: var(--muted-text);
+  opacity: 0.7;
+}
+
+/* Чат */
+.chat-container {
+  background-color: var(--card-bg);
+}
+
+.chat-messages {
+  background-color: var(--chat-bg) !important;
+}
+
+.message-bubble .message-content {
+  background-color: var(--chat-message-in);
+  color: var(--text-color);
+}
+
+.message-bubble.outgoing .message-content {
+  background-color: var(--chat-message-out);
+  color: white;
+}
+
+/* Бейджи */
+.badge.bg-light {
+  background-color: var(--badge-bg) !important;
+  color: var(--badge-text) !important;
+}
+
+/* Прогресс-бары */
+.progress {
+  background-color: var(--progress-bg) !important;
+}
+
+/* Алерты */
+.alert {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+
+/* Кнопки-закрытия в алертах и тостах */
+.btn-close {
+  filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+[data-theme="light"] .btn-close {
+  filter: none;
+}
+
+/* Текст-muted */
+.text-muted {
+  color: var(--muted-text) !important;
+}
+
+/* Навигационные табы */
+.nav-tabs .nav-link {
+  color: var(--text-color);
+}
+
+.nav-tabs .nav-link:hover {
+  border-color: var(--border-color);
+}
+
+.nav-tabs .nav-link.active {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+
+/* Пагинация */
+.page-link {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+
+.page-link:hover {
+  background-color: var(--dropdown-hover-bg);
+  color: var(--text-color);
+}
+
+.page-item.active .page-link {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.page-item.disabled .page-link {
+  background-color: var(--card-bg);
+  color: var(--muted-text);
+}
+
+/* Список групп */
+.list-group-item {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+
+/* Карточка-header */
+.card-header {
+  background-color: var(--card-bg);
+  border-bottom-color: var(--border-color);
+}
+
+.card-footer {
+  background-color: var(--card-bg);
+  border-top-color: var(--border-color);
+}
+
+/* Временные слоты в бронировании */
+.time-slot.available {
+  background-color: var(--badge-bg);
+  border-color: var(--border-color);
+  color: var(--text-color);
+}
+
+/* Выпадающий список поиска */
+.dropdown-menu .dropdown-item {
+  color: var(--text-color);
+}
+
+/* Кнопка outline */
+.btn-outline-secondary {
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+
+.btn-outline-secondary:hover {
+  background-color: var(--dropdown-hover-bg);
+  color: var(--text-color);
+}
+
+.btn-outline-primary {
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--primary);
+  color: white;
+}
+
+/* Стили для активной кнопки темы */
+.theme-btn.active {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+}
+
+/* Адаптация для high-contrast темы */
+[data-theme="high-contrast"] .btn-primary,
+[data-theme="high-contrast"] .badge {
+  border: 2px solid #ffff00;
+}
+
+[data-theme="high-contrast"] a,
+[data-theme="high-contrast"] .btn-link {
+  color: #ffff00 !important;
+  text-decoration: underline;
+}
+
+[data-theme="high-contrast"] .navbar-brand {
+  color: #ffff00 !important;
+}
+
+.hero-section {
+  background: var(--hero-bg) !important;
+  color: var(--hero-text) !important;
+}
+
+.hero-section h1 {
+  color: var(--hero-text) !important;
+}
+
+.hero-section .lead {
+  color: var(--hero-subtext) !important;
+}
+
+/* Аккордеон (FAQ) */
+.accordion-item {
+    background-color: var(--card-bg) !important;
+    border-color: var(--border-color) !important;
+}
+
+.accordion-button {
+    background-color: var(--card-bg) !important;
+    color: var(--text-color) !important;
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: var(--primary) !important;
+    color: white !important;
+}
+
+.accordion-button:focus {
+    box-shadow: 0 0 0 0.25rem rgba(0, 84, 166, 0.25) !important;
+    border-color: var(--primary-light) !important;
+}
+
+.accordion-button::after {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+[data-theme="light"] .accordion-button::after {
+    filter: none;
+}
+
+.accordion-body {
+    background-color: var(--card-bg) !important;
+    color: var(--text-color) !important;
+}
+
+@media (max-width: 991px) {
+    [data-theme="dark"] .navbar-collapse {
+        background-color: var(--navbar-bg);
+    }
+    
+    [data-theme="high-contrast"] .navbar-collapse {
+        background-color: #000000;
+    }
+    
+    .navbar-collapse.show {
+        border-radius: 0 0 1rem 1rem;
+        padding-bottom: 1rem;
+    }
+}
+
+.admin-menu-card {
+    background-color: var(--card-bg) !important;
+    transition: all 0.2s ease-in-out;
+    border: 1px solid var(--border-color) !important;
+}
+
+.admin-menu-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 84, 166, 0.15);
+    border-color: var(--primary-light) !important;
+    background-color: var(--dropdown-hover-bg) !important;
+}
+
+.admin-menu-card i {
+    transition: transform 0.2s;
+    color: var(--text-color);
+}
+
+.admin-menu-card:hover i {
+    transform: scale(1.1);
+}
+
+.admin-menu-card h6 {
+    color: var(--text-color) !important;
+}
+
+.admin-menu-card small {
+    color: var(--muted-text) !important;
+}
+
+[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+}
+
+[data-theme="dark"] input[type="date"] {
+    color-scheme: dark;
+}
+
+[data-theme="high-contrast"] input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1) brightness(200%);
+    cursor: pointer;
+}
+
+[data-theme="high-contrast"] input[type="date"] {
+    color-scheme: dark;
+}
+
+.news-title {
+    color: var(--text-color) !important;
+}
+
+[data-theme="light"] .news-title {
+    color: #212529 !important;
+}
+
+[data-theme="dark"] .news-title {
+    color: #e9ecef !important;
+}
+
+[data-theme="high-contrast"] .news-title {
+    color: #ffff00 !important;
+}
+
+#notificationsMenu .border-bottom {
+    background-color: var(--card-bg) !important;
+    border-bottom-color: var(--border-color) !important;
+}
+
+#notificationsMenu .bg-light {
+    background-color: var(--card-bg) !important;
+}
+
+#notificationsMenu h6 {
+    color: var(--text-color) !important;
+}
+
+#notificationsMenu .btn-link {
+    color: var(--primary) !important;
+}
+
+#notificationsMenu .btn-link:hover {
+    color: var(--primary-dark) !important;
+}
+
+/* Уведомления внутри списка */
+.notification-item {
+    background-color: var(--card-bg);
+    transition: background-color 0.2s;
+}
+
+.notification-item:hover {
+    background-color: var(--dropdown-hover-bg) !important;
+}
+
+.notification-item .text-secondary {
+    color: var(--text-color) !important;
+    opacity: 0.8;
+}
+
+.notification-item .text-muted {
+    color: var(--muted-text) !important;
+}
+
+/* Для тёмной темы */
+[data-theme="dark"] #notificationsMenu .bg-light {
+    background-color: var(--card-bg) !important;
+}
+
+[data-theme="dark"] .notification-item:hover {
+    background-color: var(--dropdown-hover-bg) !important;
+}
+
+/* Для high-contrast */
+[data-theme="high-contrast"] #notificationsMenu .bg-light {
+    background-color: var(--card-bg) !important;
+}
+
+[data-theme="high-contrast"] .notification-item:hover {
+    background-color: var(--dropdown-hover-bg) !important;
+}

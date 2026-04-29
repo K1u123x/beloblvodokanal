@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Водоканал Сервис{% endblock %}</title>
+
+    <!-- Установка темы ДО загрузки -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            
+            const accessibilityEnabled = localStorage.getItem('accessibility') === 'true';
+            if (accessibilityEnabled) {
+                document.documentElement.setAttribute('data-accessibility', 'true');
+                document.documentElement.setAttribute('data-font-size', localStorage.getItem('fontSize') || 'medium');
+                document.documentElement.setAttribute('data-accessibility-theme', localStorage.getItem('accessibilityTheme') || 'light');
+            }
+        })();
+    </script>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}?v=1">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='fonts/bootstrap-icons.css') }}">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Основные стили -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/themes.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/accessibility.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.0.0-beta3/css/all.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='fonts/css/all.min.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body data-user-id="{% if current_user.is_authenticated %}{{ current_user.id }}{% endif %}">
+    <div class="top-bar py-2 d-none d-md-block">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <i class="bi bi-geo-alt-fill text-primary"></i> г. Белгород, ул. 5 Августа, 5
+                </div>
+                <div class="col-md-6 text-end">
+                    <i class="bi bi-telephone-fill text-primary"></i> +7 (4722) 23-02-23 &nbsp;&nbsp;
+                    <i class="bi bi-envelope-fill text-primary"></i> info@belwater.ru
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="page-loader" style="position: fixed; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, #00aeef, #0054a6); z-index: 9999; transform: scaleX(0); transform-origin: left; transition: transform 0.2s ease; opacity: 0;"></div>
+    
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index.index') }}">
+                <i class="bi bi-droplet-half me-2"></i>БелОблВодоканал
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('index.index') }}">Главная</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">О компании</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ url_for('index.about_history') }}">История</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('index.about_management') }}">Руководство</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('index.about_vacancies') }}">Вакансии</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Абонентам</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ url_for('index.clients_tariffs') }}">Тарифы</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('index.clients_meter_readings') }}">Передать показания</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('index.clients_faq') }}">Частые вопросы</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('index.contacts') }}">Контакты</a></li>
+                </ul>
+                
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item d-flex align-items-center">
+                        <div class="btn-group theme-switcher me-2" role="group" id="normalThemeSwitcher">
+                            <button type="button" class="btn btn-outline-light theme-btn px-3" data-theme="light" title="Светлая тема">
+                                <i class="bi bi-sun-fill"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-light theme-btn px-3" data-theme="dark" title="Тёмная тема">
+                                <i class="bi bi-moon-fill"></i>
+                            </button>
+                        </div>
+                        
+                        <div id="accessibilityPanel" style="display: none; opacity: 0; transition: opacity 0.3s ease;">
+                            <div class="d-flex align-items-center">
+                                <div class="btn-group me-2" role="group">
+                                    <button type="button" class="btn btn-outline-light accessibility-font-btn" data-size="small" title="Мелкий текст">A-</button>
+                                    <button type="button" class="btn btn-outline-light accessibility-font-btn" data-size="medium" title="Средний текст">A</button>
+                                    <button type="button" class="btn btn-outline-light accessibility-font-btn" data-size="large" title="Крупный текст">A+</button>
+                                </div>
+                                
+                                <div class="btn-group me-2" role="group">
+                                    <button type="button" class="btn btn-outline-light accessibility-theme-btn" data-access-theme="light" title="Светлый фон">
+                                        <i class="bi bi-sun-fill"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-light accessibility-theme-btn" data-access-theme="dark" title="Тёмный фон">
+                                        <i class="bi bi-moon-fill"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="button" class="btn btn-outline-light" id="toggleAccessibility" title="Версия для слабовидящих">
+                            <i class="bi bi-eye-fill"></i>
+                        </button>
+                    </li>
+                    
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle me-1"></i>{{ current_user.full_name }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                {% if current_user.role and current_user.role.code == 'client' %}
+                                    <li><a class="dropdown-item" href="{{ url_for('user.dashboard') }}"><i class="bi bi-speedometer2 me-2"></i>Личный кабинет</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('user.profile') }}"><i class="bi bi-person me-2"></i>Профиль</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('user.catalog') }}"><i class="bi bi-grid me-2"></i>Каталог услуг</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('user.my_requests') }}"><i class="bi bi-list-check me-2"></i>Мои заявки</a></li>
+                                {% elif current_user.role and current_user.role.code == 'dispatcher' %}
+                                    <li><a class="dropdown-item" href="{{ url_for('dispatcher.dashboard') }}"><i class="bi bi-speedometer2 me-2"></i>Панель диспетчера</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('dispatcher.requests_list', status='pending') }}"><i class="bi bi-inbox me-2"></i>Заявки</a></li>
+                                {% elif current_user.role and current_user.role.code == 'worker' %}
+                                    <li><a class="dropdown-item" href="{{ url_for('worker.dashboard') }}"><i class="bi bi-speedometer2 me-2"></i>Панель работника</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('worker.my_requests') }}"><i class="bi bi-list-check me-2"></i>Мои заявки</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('index.worker_profile', worker_id=current_user.worker_profile.id) }}"><i class="bi bi-person me-2"></i>Мой профиль</a></li>
+                                {% elif current_user.role and current_user.role.code == 'admin' %}
+                                    <li><a class="dropdown-item" href="{{ url_for('admin.dashboard') }}"><i class="bi bi-speedometer2 me-2"></i>Админ-панель</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('admin.users') }}"><i class="bi bi-people me-2"></i>Пользователи</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('admin.cities') }}"><i class="bi bi-building me-2"></i>Города</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('admin.services') }}"><i class="bi bi-tools me-2"></i>Услуги</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('admin.news_list') }}"><i class="bi bi-newspaper me-2"></i>Новости</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('admin.reviews') }}"><i class="bi bi-star me-2"></i>Отзывы</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('admin.reports') }}"><i class="bi bi-bar-chart me-2"></i>Отчёты</a></li>
+                                {% endif %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}"><i class="bi bi-box-arrow-right me-2"></i>Выйти</a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">Вход</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.register') }}">Регистрация</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mt-4">
+        <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1080;">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+                {% set bg = 'bg-' + category if category in ['success','danger','warning','info'] else 'bg-info' %}
+                {% set icon = 'check-circle' if category == 'success' else 'exclamation-circle' if category == 'danger' else 'exclamation-triangle' if category == 'warning' else 'info-circle' %}
+                <div class="toast align-items-center text-white {{ bg }} border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="4000">
+                <div class="d-flex">
+                    <div class="toast-body">
+                    <i class="bi bi-{{ icon }} me-2"></i>{{ message }}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+                </div>
+            {% endfor %}
+            {% endif %}
+        {% endwith %}
+        </div>
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer mt-auto py-5 text-white">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <h5><i class="fas fa-droplet me-2"></i>БелОблВодоканал</h5>
+                    <p class="small">Гарантируем качество и своевременность</p>
+                    <div class="d-flex gap-3 mt-3">
+                        <a href="https://vk.com/belwater" target="_blank" class="social-icon" title="ВКонтакте">
+                            <i class="fab fa-vk"></i>
+                        </a>
+                        <a href="https://ok.ru/group/57627831369733" target="_blank" class="social-icon" title="Одноклассники">
+                            <i class="fab fa-odnoklassniki"></i>
+                        </a>
+                        <a href="https://t.me/belwater" target="_blank" class="social-icon" title="Telegram">
+                            <i class="fab fa-telegram-plane"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h6>Контакты</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fas fa-phone-alt me-2"></i>+7 (4722) 23-02-23 (диспетчерская)</li>
+                        <li class="mb-2"><i class="fas fa-envelope me-2"></i>info@belwater.ru</li>
+                        <li><i class="fas fa-clock me-2"></i>Пн-Пт: 8:30–19:00, Сб-Вс: выходной</li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h6>Полезные ссылки</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="{{ url_for('index.about_history') }}" class="text-white-50 text-decoration-none">О компании</a></li>
+                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Новости</a></li>
+                        <li class="mb-2"><a href="{{ url_for('index.clients_tariffs') }}" class="text-white-50 text-decoration-none">Тарифы</a></li>
+                        <li><a href="{{ url_for('index.contacts') }}" class="text-white-50 text-decoration-none">Контакты</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="bg-secondary opacity-25">
+            <div class="text-center small text-white-50">
+                © 2026 БелОблВодоканал. Все права защищены.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Лайтбокс для фото -->
+    <div class="lightbox-overlay" id="lightboxOverlay">
+        <span class="lightbox-close" id="lightboxClose">&times;</span>
+        <img class="lightbox-image" id="lightboxImage" alt="">
+    </div>
+
+    <style>
+        .lightbox-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 10000;
+            cursor: zoom-out;
+            backdrop-filter: blur(8px);
+            align-items: center;
+            justify-content: center;
+        }
+        .lightbox-overlay.active {
+            display: flex;
+        }
+        .lightbox-image {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: #fff;
+            font-size: 48px;
+            font-weight: 300;
+            cursor: pointer;
+            z-index: 10001;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.2s;
+        }
+        .lightbox-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+        @media (max-width: 768px) {
+            .lightbox-close {
+                top: 10px;
+                right: 15px;
+                font-size: 36px;
+                width: 40px;
+                height: 40px;
+            }
+        }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <script>
+        function openLightbox(src) {
+            console.log('openLightbox called with:', src);
+            var overlay = document.getElementById('lightboxOverlay');
+            var img = document.getElementById('lightboxImage');
+            
+            overlay.classList.add('active');
+            img.src = src;
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeLightbox() {
+            var overlay = document.getElementById('lightboxOverlay');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            var overlay = document.getElementById('lightboxOverlay');
+            var closeBtn = document.getElementById('lightboxClose');
+            
+            // Закрытие по клику на фон
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) {
+                    closeLightbox();
+                }
+            });
+            
+            // Закрытие по кнопке
+            closeBtn.addEventListener('click', closeLightbox);
+            
+            // Закрытие по ESC
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeLightbox();
+                }
+            });
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var toastElements = [].slice.call(document.querySelectorAll('.toast'));
+            toastElements.map(function (toastEl) {
+                return new bootstrap.Toast(toastEl).show();
+            });
+        });
+    </script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const footer = document.querySelector('.footer');
+            if (!footer) return;
+            let hasScrolled = false;
+            function checkScroll() {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                const windowHeight = window.innerHeight;
+                const documentHeight = Math.max(
+                    document.body.scrollHeight, document.documentElement.scrollHeight,
+                    document.body.offsetHeight, document.documentElement.offsetHeight,
+                    document.body.clientHeight, document.documentElement.clientHeight
+                );
+                if (hasScrolled && scrollTop + windowHeight >= documentHeight - 50) {
+                    footer.classList.add('footer-visible');
+                } else {
+                    footer.classList.remove('footer-visible');
+                }
+            }
+            function markScrolled() {
+                if (!hasScrolled) {
+                    hasScrolled = true;
+                    checkScroll();
+                }
+            }
+            const hasScrollbar = document.documentElement.scrollHeight > window.innerHeight;
+            if (!hasScrollbar) {
+                footer.classList.remove('footer-visible');
+                return;
+            }
+            checkScroll();
+            window.addEventListener('scroll', function() {
+                markScrolled();
+                checkScroll();
+            });
+            window.addEventListener('resize', checkScroll);
+        });
+    </script>
+    
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/animations.js') }}"></script>
+    
+    <script>
+        (function() {
+            var loader = document.getElementById('page-loader');
+            if (loader) {
+                var width = 0;
+                var interval = setInterval(function() {
+                    width += 20;
+                    loader.style.opacity = '1';
+                    loader.style.transform = 'scaleX(' + (width / 100) + ')';
+                    if (width >= 90) {
+                        clearInterval(interval);
+                    }
+                }, 50);
+
+                window.addEventListener('load', function() {
+                    clearInterval(interval);
+                    loader.style.transform = 'scaleX(1)';
+                    setTimeout(() => {
+                        loader.style.opacity = '0';
+                        loader.style.transform = 'scaleX(0)';
+                    }, 200);
+                });
+            }
+        })();
+    </script>
+</body>
+</html>

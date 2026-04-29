@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% block title %}Отзывы{% endblock %}
+{% block content %}
+<div class="mb-3">
+    <button onclick="history.back()" class="btn btn-outline-secondary rounded-pill">
+        <i class="bi bi-arrow-left"></i> Назад
+    </button>
+</div>
+
+<h2 class="fw-bold mb-4">Отзывы</h2>
+
+<!-- Фильтры -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <input type="text" id="reviewSearch" class="form-control rounded-pill" placeholder="🔍 Поиск по автору, работнику или комментарию...">
+            </div>
+            <div class="col-md-2">
+                <select id="ratingFilter" class="form-select rounded-pill">
+                    <option value="all">Все оценки</option>
+                    <option value="5">⭐ 5 звёзд</option>
+                    <option value="4">⭐ 4 звезды</option>
+                    <option value="3">⭐ 3 звезды</option>
+                    <option value="2">⭐ 2 звезды</option>
+                    <option value="1">⭐ 1 звезда</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-outline-secondary rounded-pill w-100" id="resetFilters">
+                    <i class="bi bi-arrow-counterclockwise"></i> Сбросить
+                </button>
+            </div>
+            <div class="col-md-4 text-end">
+                <span class="text-muted" id="reviewCount">Всего: {{ reviews|length }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-hover align-middle mb-0" id="reviewsTable">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Заявка</th>
+                    <th>Автор</th>
+                    <th>Работник</th>
+                    <th>Оценка</th>
+                    <th>Комментарий</th>
+                    <th>Дата</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for review in reviews %}
+                <tr data-rating="{{ review.rating }}">
+                    <td>{{ review.id }}</td>
+                    <td>#{{ review.request_id }}</td>
+                    <td class="review-author">{{ review.client.user.full_name }}</td>
+                    <td class="review-worker">{{ review.worker.full_name }}</td>
+                    <td>
+                        <span class="text-warning">
+                            {% for i in range(5) %}
+                                {% if i < review.rating %}★{% else %}☆{% endif %}
+                            {% endfor %}
+                        </span>
+                    </td>
+                    <td class="review-comment">
+                        {{ review.comment|truncate(40) if review.comment else '—' }}
+                        {% if review.photo %}
+                        <a href="{{ url_for('static', filename='uploads/reviews/' + review.photo) }}" target="_blank" class="text-success ms-2" title="Открыть фото">
+                            <i class="bi bi-image"></i>
+                        </a>
+                        {% endif %}
+                    </td>
+                    <td>{{ review.created_at.strftime('%d.%m.%Y') }}</td>
+                    <td>
+                        <a href="{{ url_for('admin.delete_review', review_id=review.id) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Удалить отзыв?')">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% if pagination and pagination.pages > 1 %}
+<nav class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if pagination.has_prev %}
+        <li class="page-item"><a class="page-link" href="{{ url_for('admin.reviews', page=pagination.prev_num) }}">&laquo;</a></li>
+        {% endif %}
+        {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+            {% if page_num %}
+                <li class="page-item {% if page_num == pagination.page %}active{% endif %}">
+                    <a class="page-link" href="{{ url_for('admin.reviews', page=page_num) }}">{{ page_num }}</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">…</span></li>
+            {% endif %}
+        {% endfor %}
+        {% if pagination.has_next %}
+        <li class="page-item"><a class="page-link" href="{{ url_for('admin.reviews', page=pagination.next_num) }}">&raquo;</a></li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    function filterTable() {
+        var searchText = $('#reviewSearch').val().toLowerCase();
+        var ratingFilter = $('#ratingFilter').val();
+        var visibleCount = 0;
+        
+        $('#reviewsTable tbody tr').each(function() {
+            var row = $(this);
+            var author = row.find('.review-author').text().toLowerCase();
+            var worker = row.find('.review-worker').text().toLowerCase();
+            var comment = row.find('.review-comment').text().toLowerCase();
+            var rating = row.data('rating').toString();
+            
+            var matchesSearch = author.indexOf(searchText) > -1 || 
+                               worker.indexOf(searchText) > -1 || 
+                               comment.indexOf(searchText) > -1;
+            var matchesRating = ratingFilter === 'all' || rating === ratingFilter;
+            
+            if (matchesSearch && matchesRating) {
+                row.show();
+                visibleCount++;
+            } else {
+                row.hide();
+            }
+        });
+        
+        $('#reviewCount').text('Найдено: ' + visibleCount + ' из {{ reviews|length }}');
+    }
+    
+    $('#reviewSearch').on('keyup', filterTable);
+    $('#ratingFilter').on('change', filterTable);
+    
+    $('#resetFilters').click(function() {
+        $('#reviewSearch').val('');
+        $('#ratingFilter').val('all');
+        filterTable();
+    });
+});
+</script>
+{% endblock %}

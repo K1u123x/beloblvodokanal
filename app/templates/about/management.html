@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Руководство{% endblock %}
+{% block content %}
+
+<div class="mb-3">
+    <button onclick="history.back()" class="btn btn-outline-secondary rounded-pill">
+        <i class="bi bi-arrow-left"></i> Назад
+    </button>
+</div>
+
+<h2 class="fw-bold mb-4">Руководство компании</h2>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <img src="{{ url_for('static', filename='images/about/ceo.png') }}" class="card-img-top" alt="Генеральный директор">
+            <div class="card-body">
+                <h5 class="card-title">Иванов Сергей Петрович</h5>
+                <p class="text-muted">Генеральный директор</p>
+                <p class="card-text">Заслуженный работник ЖКХ РФ, стаж работы в отрасли более 25 лет.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <img src="{{ url_for('static', filename='images/about/engineer.png') }}" class="card-img-top" alt="Главный инженер">
+            <div class="card-body">
+                <h5 class="card-title">Петров Андрей Владимирович</h5>
+                <p class="text-muted">Главный инженер</p>
+                <p class="card-text">Кандидат технических наук, руководит техническим развитием предприятия.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <img src="{{ url_for('static', filename='images/about/finance.png') }}" class="card-img-top" alt="Финансовый директор">
+            <div class="card-body">
+                <h5 class="card-title">Смирнова Елена Алексеевна</h5>
+                <p class="text-muted">Финансовый директор</p>
+                <p class="card-text">Отвечает за финансовую устойчивость и инвестиционные программы.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

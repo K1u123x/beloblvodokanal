@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+{% block title %}Главная - БелОблВодоканал{% endblock %}
+{% block content %}
+
+<!-- Hero секция -->
+<section class="hero-section py-5 text-center" style="border-radius: 0 0 3rem 3rem; margin-bottom: 2rem;">
+    <div class="container">
+        <h1 class="display-4 fw-bold mb-3">Сервис БелОблВодоканала</h1>
+        <p class="lead fs-3 text-secondary">Быстрое решение проблем с водой</p>
+        <div class="mt-4">
+            {% if current_user.is_authenticated %}
+                {% if current_user.role_ref and current_user.role_ref.code == 'client' %}
+                    <a href="{{ url_for('user.catalog') }}" class="btn btn-primary btn-lg px-5 py-3 me-3 shadow">Оставить заявку</a>
+                {% elif current_user.role_ref and current_user.role_ref.code == 'dispatcher' %}
+                    <a href="{{ url_for('dispatcher.dashboard') }}" class="btn btn-primary btn-lg px-5 py-3 me-3 shadow">Панель диспетчера</a>
+                {% elif current_user.role_ref and current_user.role_ref.code == 'worker' %}
+                    <a href="{{ url_for('worker.dashboard') }}" class="btn btn-primary btn-lg px-5 py-3 me-3 shadow">Панель работника</a>
+                {% elif current_user.role_ref and current_user.role_ref.code == 'admin' %}
+                    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-primary btn-lg px-5 py-3 me-3 shadow">Админ-панель</a>
+                {% endif %}
+            {% else %}
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg px-5 py-3 me-3 shadow">Зарегистрироваться</a>
+                <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary btn-lg px-5 py-3">Войти</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Популярные услуги -->
+<div class="container mb-5">
+    <h2 class="fw-bold">Наши услуги</h2>
+    <div class="row g-4">
+        {% for service in services %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100">
+                <div class="card-body d-flex flex-column p-4">
+                    <div class="mb-3">
+                        <i class="bi {{ service.icon if service.icon else 'bi-droplet-half' }} fs-1 text-primary"></i>
+                    </div>
+                    <h5 class="card-title fw-bold">{{ service.name }}</h5>
+                    <div class="card-text flex-grow-1">
+                        <p class="service-description-short mb-0" style="cursor: pointer;">
+                            {{ service.description|truncate(60) }}
+                            {% if service.description|length > 60 %}
+                                <span class="text-primary">… ещё</span>
+                            {% endif %}
+                        </p>
+                        <p class="service-description-full d-none" style="cursor: pointer;">
+                            {{ service.description }}
+                            <span class="text-primary"> (свернуть)</span>
+                        </p>
+                    </div>
+                    <div class="mt-3 d-flex justify-content-between align-items-center">
+                        <span class="h5 fw-bold text-primary">{{ service.price }} ₽</span>
+                        <span class="badge bg-light text-dark"><i class="bi bi-clock"></i> {{ service.duration }} мин</span>
+                    </div>
+                    {% if current_user.is_authenticated and current_user.role_ref and current_user.role_ref.code == 'client' %}
+                    <a href="{{ url_for('user.book', service_id=service.id) }}" class="btn btn-outline-primary rounded-pill mt-3">Забронировать</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Отзывы -->
+{% if reviews %}
+<div class="container mb-5">
+    <h2 class="fw-bold mb-4">Последние отзывы</h2>
+    <div class="row g-4">
+        {% for review in reviews %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 review-card">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="me-3">
+                            <img src="https://ui-avatars.com/api/?name={{ review.client.user.first_name }}+{{ review.client.user.last_name }}&background=0054a6&color=fff&size=56&length=2&bold=true" 
+                                 class="rounded-circle" style="width: 56px; height: 56px; aspect-ratio: 1/1; flex-shrink: 0;">
+                        </div>
+                        <div>
+                            <h6 class="mb-0 fw-bold">{{ review.client.user.full_name }}</h6>
+                            <div class="text-warning small">
+                                {% for i in range(5) %}
+                                    {% if i < review.rating %}★{% else %}☆{% endif %}
+                                {% endfor %}
+                            </div>
+                            <small class="text-muted">{{ review.created_at.strftime('%d.%m.%Y') }}</small>
+                        </div>
+                    </div>
+                    <p class="card-text fst-italic">"{{ review.comment|truncate(120) }}"</p>
+                    <p class="card-text small">
+                        <i class="bi bi-person-badge me-1"></i>
+                        <a href="{{ url_for('index.worker_profile', worker_id=review.worker.id) }}" class="text-decoration-none">
+                            {{ review.worker.user.full_name }}
+                        </a>
+                    </p>
+                    {% if review.photo %}
+                    <div class="mt-3">
+                        {% set photo_path = 'uploads/reviews/' + review.photo %}
+                        {% set photo_url = url_for('static', filename=photo_path) %}
+                        <a href="{{ photo_url }}" target="_blank">
+                            <img src="{{ photo_url }}" 
+                                alt="Фото отзыва" 
+                                class="rounded-4 shadow-sm"
+                                style="max-height: 160px; max-width: 100%; object-fit: contain; display: block; transition: transform 0.2s; cursor: pointer;"
+                                onmouseover="this.style.transform='scale(1.02)'"
+                                onmouseout="this.style.transform='scale(1)'"
+                                onerror="this.style.display='none'">
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Блок новостей с фото -->
+<div class="container mb-5">
+    <h2 class="fw-bold mb-4">Новости</h2>
+    
+    {% if news_items %}
+    <div class="row g-4">
+        {% for item in news_items %}
+        <div class="col-md-4">
+            <a href="{{ url_for('index.news_detail', news_id=item.id) }}" class="text-decoration-none">
+                <div class="card h-100 news-card">
+                    {% if item.image_filename %}
+                        <img src="{{ url_for('static', filename='uploads/news/' + item.image_filename) }}" 
+                            class="card-img-top" alt="{{ item.title }}" 
+                            style="height: 200px; width: 100%; object-fit: cover; background-color: var(--card-bg);">
+                    {% else %}
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <i class="bi bi-newspaper fs-1 text-muted"></i>
+                    </div>
+                    {% endif %}
+                    <div class="card-body">
+                       <h5 class="card-title fw-bold news-title">{{ item.title }}</h5>
+                        <p class="card-text text-secondary">{{ item.summary or item.content|truncate(100) }}</p>
+                        <p class="card-text">
+                            <small class="text-muted">
+                                <i class="bi bi-calendar3 me-1"></i>{{ item.created_at.strftime('%d.%m.%Y') }}
+                            </small>
+                        </p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% if news_items|length >= 3 %}
+    <div class="text-center mt-4">
+        <a href="#" class="btn btn-outline-primary rounded-pill px-4">Все новости</a>
+    </div>
+    {% endif %}
+    
+    {% else %}
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <span style="font-size: 4rem;">📰</span>
+            <h4 class="mt-3">Новостей пока нет</h4>
+            <p class="text-muted">Следите за обновлениями — скоро здесь появится интересная информация!</p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    $(document).on('click', '.service-description-short', function() {
+        $(this).addClass('d-none');
+        $(this).siblings('.service-description-full').removeClass('d-none');
+    });
+
+    $(document).on('click', '.service-description-full', function() {
+        $(this).addClass('d-none');
+        $(this).siblings('.service-description-short').removeClass('d-none');
+    });
+});
+</script>
+{% endblock %}

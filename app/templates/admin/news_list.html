@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block title %}Управление новостями{% endblock %}
+{% block content %}
+<div class="mb-3">
+    <button onclick="history.back()" class="btn btn-outline-secondary rounded-pill">
+        <i class="bi bi-arrow-left"></i> Назад
+    </button>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold">Новости</h2>
+    <a href="{{ url_for('admin.create_news') }}" class="btn btn-primary rounded-pill">
+        <i class="bi bi-plus-lg"></i> Добавить новость
+    </a>
+</div>
+
+<!-- Фильтры -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <input type="text" id="newsSearch" class="form-control rounded-pill" placeholder="🔍 Поиск по заголовку...">
+            </div>
+            <div class="col-md-3">
+                <select id="statusFilter" class="form-select rounded-pill">
+                    <option value="all">Все новости</option>
+                    <option value="published">Опубликованные</option>
+                    <option value="draft">Черновики</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-outline-secondary rounded-pill w-100" id="resetFilters">
+                    <i class="bi bi-arrow-counterclockwise"></i> Сбросить
+                </button>
+            </div>
+            <div class="col-md-3 text-end">
+                <span class="text-muted" id="newsCount">Всего: {{ news|length }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-hover align-middle mb-0" id="newsTable">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Фото</th>
+                    <th>Заголовок</th>
+                    <th>Дата</th>
+                    <th>Статус</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in news %}
+                <tr data-status="{{ 'published' if item.is_published else 'draft' }}">
+                    <td>{{ item.id }}</td>
+                    <td>
+                        {% if item.image_filename %}
+                        <img src="{{ url_for('static', filename='uploads/news/' + item.image_filename) }}" alt="thumb" style="height: 40px; width: 60px; object-fit: cover;" class="rounded">
+                        {% else %}
+                        <i class="bi bi-image text-muted"></i>
+                        {% endif %}
+                    </td>
+                    <td class="news-title">{{ item.title }}</td>
+                    <td>{{ item.created_at.strftime('%d.%m.%Y') }}</td>
+                    <td>
+                        {% if item.is_published %}
+                        <span class="badge bg-success">Опубликовано</span>
+                        {% else %}
+                        <span class="badge bg-secondary">Черновик</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ url_for('admin.edit_news', news_id=item.id) }}" class="btn btn-sm btn-outline-warning">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <a href="{{ url_for('admin.delete_news', news_id=item.id) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Удалить новость?')">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    function filterTable() {
+        var searchText = $('#newsSearch').val().toLowerCase();
+        var statusFilter = $('#statusFilter').val();
+        var visibleCount = 0;
+        
+        $('#newsTable tbody tr').each(function() {
+            var row = $(this);
+            var title = row.find('.news-title').text().toLowerCase();
+            var status = row.data('status');
+            
+            var matchesSearch = title.indexOf(searchText) > -1;
+            var matchesStatus = statusFilter === 'all' || status === statusFilter;
+            
+            if (matchesSearch && matchesStatus) {
+                row.show();
+                visibleCount++;
+            } else {
+                row.hide();
+            }
+        });
+        
+        $('#newsCount').text('Найдено: ' + visibleCount + ' из {{ news|length }}');
+    }
+    
+    $('#newsSearch').on('keyup', filterTable);
+    $('#statusFilter').on('change', filterTable);
+    
+    $('#resetFilters').click(function() {
+        $('#newsSearch').val('');
+        $('#statusFilter').val('all');
+        filterTable();
+    });
+});
+</script>
+{% endblock %}

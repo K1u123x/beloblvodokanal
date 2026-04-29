@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="mb-3">
+    <button onclick="history.back()" class="btn btn-outline-secondary rounded-pill">
+        <i class="bi bi-arrow-left"></i> Назад
+    </button>
+</div>
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h4>{{ legend }}</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ form.title.label(class="form-label") }}
+                        {{ form.title(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.summary.label(class="form-label") }}
+                        {{ form.summary(class="form-control", rows=3) }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.content.label(class="form-label") }}
+                        {{ form.content(class="form-control", rows=5) }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.image.label(class="form-label") }}
+                        {{ form.image(class="form-control") }}
+                        <small class="text-muted">JPG, PNG, JPEG. Необязательно.</small>
+                        {% if news and news.image_filename %}
+                        <div class="mt-2">
+                            <img src="{{ url_for('static', filename='uploads/news/' + news.image_filename) }}" 
+                                alt="Текущее фото" style="max-height: 100px;" class="rounded">
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3 form-check">
+                        {{ form.is_published(class="form-check-input") }}
+                        {{ form.is_published.label(class="form-check-label") }}
+                    </div>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                    <a href="{{ url_for('admin.news_list') }}" class="btn btn-secondary">Отмена</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

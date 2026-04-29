@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% block title %}Мои заявки{% endblock %}
+{% block content %}
+
+<div class="mb-3">
+    <button onclick="history.back()" class="btn btn-outline-secondary rounded-pill">
+        <i class="bi bi-arrow-left"></i> Назад
+    </button>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold"><i class="bi bi-list-check me-2"></i>Мои заявки</h2>
+</div>
+
+<!-- Фильтры -->
+<div class="card mb-4 shadow-sm">
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <input type="text" id="requestSearch" class="form-control rounded-pill" 
+                       placeholder="🔍 Поиск по услуге или клиенту...">
+            </div>
+            <div class="col-md-3">
+                <select id="statusFilter" class="form-select rounded-pill">
+                    <option value="all">Все статусы</option>
+                    <option value="assigned">Назначена</option>
+                    <option value="in_progress">В работе</option>
+                    <option value="completed">Выполнена</option>
+                    <option value="rejected">Отклонена</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button class="btn btn-outline-secondary rounded-pill w-100" id="resetFilters">
+                    <i class="bi bi-arrow-counterclockwise"></i> Сбросить
+                </button>
+            </div>
+            <div class="col-md-2 text-end">
+                <span class="text-muted" id="requestCount">Всего: {{ requests|length }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Список заявок -->
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        {% if requests %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="requestsTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>№</th>
+                        <th>Услуга</th>
+                        <th>Клиент</th>
+                        <th>Телефон</th>
+                        <th>Город</th>
+                        <th>Адрес</th>
+                        <th>Дата</th>
+                        <th>Время</th>
+                        <th>Статус</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for req in requests %}
+                    <tr data-status="{{ req.status.code if req.status else '' }}">
+                        <td><span class="badge bg-secondary">#{{ req.id }}</span></td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <i class="bi {{ req.service.icon if req.service.icon else 'bi-droplet-half' }} me-2 text-primary"></i>
+                                <span class="service-name">{{ req.service.name }}</span>
+                            </div>
+                        </td>
+                        <td class="client-name">{{ req.client.user.full_name }}</td>
+                        <td>{{ req.client.user.phone or '—' }}</td>
+                        <td>{{ req.city.name if req.city else '—' }}</td>
+                        <td>{{ req.street }}, д.{{ req.house }}{% if req.apartment %}, кв.{{ req.apartment }}{% endif %}</td>
+                        <td>{{ req.scheduled_date.strftime('%d.%m.%Y') }}</td>
+                        <td>{{ req.scheduled_time_start.strftime('%H:%M') }}</td>
+                        <td>
+                            <span class="badge bg-{{ req.status.color if req.status else 'secondary' }} status-badge">
+                                {{ req.status_ru }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                <a href="{{ url_for('worker.request_detail', request_id=req.id) }}" 
+                                   class="btn btn-sm btn-outline-primary rounded-circle" 
+                                   style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;"
+                                   title="Подробнее">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                {% if req.status and req.status.code in ['assigned', 'in_progress'] %}
+                                <a href="{{ url_for('worker.chat', request_id=req.id) }}" 
+                                   class="btn btn-sm btn-outline-info rounded-circle" 
+                                   style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;"
+                                   title="Чат">
+                                    <i class="bi bi-chat-dots"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <span style="font-size: 3rem;">📭</span>
+            <p class="text-muted mt-3">У вас пока нет заявок</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    function filterTable() {
+        var searchText = $('#requestSearch').val().toLowerCase();
+        var statusFilter = $('#statusFilter').val();
+        var visibleCount = 0;
+        
+        $('#requestsTable tbody tr').each(function() {
+            var row = $(this);
+            var service = row.find('.service-name').text().toLowerCase();
+            var client = row.find('.client-name').text().toLowerCase();
+            var status = row.data('status');
+            
+            var matchesSearch = service.indexOf(searchText) > -1 || client.indexOf(searchText) > -1;
+            var matchesStatus = statusFilter === 'all' || status === statusFilter;
+            
+            if (matchesSearch && matchesStatus) {
+                row.show();
+                visibleCount++;
+            } else {
+                row.hide();
+            }
+        });
+        
+        $('#requestCount').text('Найдено: ' + visibleCount + ' из {{ requests|length }}');
+    }
+    
+    $('#requestSearch').on('keyup', filterTable);
+    $('#statusFilter').on('change', filterTable);
+    
+    $('#resetFilters').click(function() {
+        $('#requestSearch').val('');
+        $('#statusFilter').val('all');
+        filterTable();
+    });
+});
+</script>
+{% endblock %}

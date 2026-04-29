@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Заявка №{{ request.id }}{% endblock %}
+{% block content %}
+<div class="mb-3">
+    <button onclick="history.back()" class="btn btn-outline-secondary rounded-pill">
+        <i class="bi bi-arrow-left"></i> Назад
+    </button>
+</div>
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h4>Заявка №{{ request.id }}</h4>
+            </div>
+            <div class="card-body">
+                <p><strong>Услуга:</strong> {{ request.service.name }}</p>
+                <p><strong>Клиент:</strong> {{ request.client.user.full_name }}</p>
+                <p><strong>Телефон:</strong> {{ request.client.user.phone if request.client.user else '—' }}</p>
+                <p><strong>Адрес:</strong> {{ request.full_address }}</p>
+                <p><strong>Описание:</strong> {{ request.description or 'нет' }}</p>
+                <p><strong>Дата:</strong> {{ request.scheduled_date.strftime('%d.%m.%Y') }}</p>
+                <p><strong>Время:</strong> {{ request.scheduled_time_start.strftime('%H:%M') }} - {{ request.scheduled_time_end.strftime('%H:%M') }}</p>
+                <p><strong>Статус:</strong> 
+                    <span class="badge bg-{{ request.status.color if request.status else 'secondary' }}">
+                        {{ request.status_ru }}
+                    </span>
+                </p>
+                <hr>
+                <div class="d-flex gap-2">
+                    {% if request.status and request.status.code == 'assigned' %}
+                        <a href="{{ url_for('worker.start_work', request_id=request.id) }}" class="btn btn-success">
+                            <i class="bi bi-play"></i> Начать работу
+                        </a>
+                    {% endif %}
+                    {% if request.status and request.status.code == 'in_progress' %}
+                        <a href="{{ url_for('worker.complete', request_id=request.id) }}" class="btn btn-success">
+                            <i class="bi bi-check-lg"></i> Завершить
+                        </a>
+                    {% endif %}
+                    {% if request.status and request.status.code in ['assigned', 'in_progress', 'completed'] %}
+                        <a href="{{ url_for('worker.chat', request_id=request.id) }}" class="btn btn-info">
+                            <i class="bi bi-chat-dots"></i> Чат с клиентом
+                        </a>
+                    {% endif %}
+                    <a href="{{ url_for('worker.my_requests') }}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Назад к списку
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

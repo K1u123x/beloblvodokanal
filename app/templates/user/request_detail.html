@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Заявка №{{ request.id }}{% endblock %}
+{% block content %}
+<div class="mb-3">
+    <button onclick="history.back()" class="btn btn-outline-secondary rounded-pill">
+        <i class="bi bi-arrow-left"></i> Назад
+    </button>
+</div>
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h4>Заявка №{{ request.id }}</h4>
+            </div>
+            <div class="card-body">
+                <p><strong>Услуга:</strong> {{ request.service.name }}</p>
+                <p><strong>Описание:</strong> {{ request.description or 'нет' }}</p>
+                <p><strong>Адрес:</strong> {{ request.full_address }}</p>
+                <p><strong>Дата:</strong> {{ request.scheduled_date.strftime('%d.%m.%Y') }}</p>
+                <p><strong>Время:</strong> {{ request.scheduled_time_start.strftime('%H:%M') }} - {{ request.scheduled_time_end.strftime('%H:%M') }}</p>
+                <p><strong>Статус:</strong> 
+                    <span class="badge bg-{{ request.status.color if request.status else 'secondary' }}">
+                        {{ request.status_ru }}
+                    </span>
+                </p>
+                
+                {% if request.worker %}
+                <p><strong>Работник:</strong> 
+                    <a href="{{ url_for('index.worker_profile', worker_id=request.worker.id) }}" class="text-decoration-none">
+                        {{ request.worker.full_name }} (рейтинг: {{ "%.1f"|format(request.worker.rating) }})
+                    </a>
+                </p>
+                {% endif %}
+                
+                {% if request.status and request.status.code == 'rejected' %}
+                <p><strong>Причина отклонения:</strong> {{ request.rejection_reason }}</p>
+                {% endif %}
+                <hr>
+                <div class="d-flex gap-2 flex-wrap">
+                    {% if request.status and request.status.code == 'pending' %}
+                        <a href="{{ url_for('user.cancel_request', request_id=request.id) }}" 
+                           class="btn btn-outline-danger" 
+                           onclick="return confirm('Вы уверены, что хотите отменить заявку?')">
+                            <i class="bi bi-x-circle"></i> Отменить заявку
+                        </a>
+                    {% endif %}
+                    
+                    {% if request.worker and request.status and request.status.code in ['assigned', 'in_progress', 'completed'] %}
+                        <a href="{{ url_for('user.chat', request_id=request.id) }}" class="btn btn-info">
+                            <i class="bi bi-chat-dots"></i> Чат с работником
+                        </a>
+                    {% endif %}
+                    
+                    {% if request.status and request.status.code == 'completed' and not request.review %}
+                        <a href="{{ url_for('user.leave_review', request_id=request.id) }}" class="btn btn-warning">
+                            <i class="bi bi-star"></i> Оставить отзыв
+                        </a>
+                    {% endif %}
+                    
+                    <a href="{{ url_for('user.my_requests') }}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Назад к списку
+                    </a>
+                </div>
+                
+                {% if request.status and request.status.code == 'completed' %}
+                    {% if request.review %}
+                    <div class="alert alert-success mt-3">
+                        <h6><i class="bi bi-check-circle-fill me-2"></i>Ваш отзыв</h6>
+                        <div class="d-flex align-items-center">
+                            <div class="text-warning me-3" style="font-size: 1.5rem;">
+                                {% for i in range(5) %}
+                                    {% if i < request.review.rating %}★{% else %}☆{% endif %}
+                                {% endfor %}
+                            </div>
+                            <div>
+                                <p class="mb-1 fst-italic">"{{ request.review.comment }}"</p>
+                                <small class="text-muted">{{ request.review.created_at.strftime('%d.%m.%Y %H:%M') }}</small>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-warning mt-3 d-flex align-items-center">
+                        <i class="bi bi-star-fill me-2"></i>
+                        <span>Вы ещё не оставили отзыв.</span>
+                        <a href="{{ url_for('user.leave_review', request_id=request.id) }}" class="btn btn-warning btn-sm ms-auto rounded-pill">
+                            Оставить отзыв
+                        </a>
+                    </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

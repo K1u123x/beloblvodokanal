@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}История компании{% endblock %}
+{% block content %}
+
+<div class="mb-3">
+    <button onclick="history.back()" class="btn btn-outline-secondary rounded-pill">
+        <i class="bi bi-arrow-left"></i> Назад
+    </button>
+</div>
+
+<div class="card">
+    <div class="card-body p-4">
+        <h2 class="fw-bold mb-4">История БелОблВодоканала</h2>
+        
+        <div class="row mb-4 align-items-stretch">
+            <div class="col-md-6 d-flex">
+                <img src="{{ url_for('static', filename='images/about/history.jpg') }}" 
+                     alt="История водоканала" 
+                     class="img-fluid rounded w-100"
+                     style="object-fit: cover; min-height: 100%;">
+            </div>
+            <div class="col-md-6">
+                <h5>Основание и развитие</h5>
+                <p>Белгородский водоканал ведёт свою историю с 1871 года, когда в городе был построен первый водопровод. За более чем 150 лет предприятие прошло путь от небольшой водонапорной башни до современного комплекса инженерных сооружений.</p>
+                <p>Сегодня ГУП «Белоблводоканал» обеспечивает питьевой водой более 1,5 миллиона жителей Белгородской области.</p>
+            </div>
+        </div>
+        
+        <h5>Ключевые даты</h5>
+        <ul class="list-group mb-4">
+            <li class="list-group-item"><strong>1871 г.</strong> — Пуск первого водопровода в Белгороде</li>
+            <li class="list-group-item"><strong>1935 г.</strong> — Образование городского водоканала</li>
+            <li class="list-group-item"><strong>1965 г.</strong> — Строительство первой очереди очистных сооружений</li>
+            <li class="list-group-item"><strong>2005 г.</strong> — Создание ГУП «Белоблводоканал»</li>
+            <li class="list-group-item"><strong>2020 г.</strong> — Внедрение цифровых технологий управления</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

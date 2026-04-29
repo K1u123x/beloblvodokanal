@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Частые вопросы{% endblock %}
+{% block content %}
+
+<div class="mb-3">
+    <button onclick="history.back()" class="btn btn-outline-secondary rounded-pill">
+        <i class="bi bi-arrow-left"></i> Назад
+    </button>
+</div>
+
+<h2 class="fw-bold mb-4">Часто задаваемые вопросы</h2>
+
+<div class="accordion" id="faqAccordion">
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                Как передать показания счётчиков?
+            </button>
+        </h2>
+        <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+                Показания можно передать через личный кабинет на сайте, по телефону +7 (4722) 23-02-23 или через мобильное приложение. Передача показаний осуществляется с 15 по 25 число каждого месяца.
+            </div>
+        </div>
+    </div>
+    
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                Что делать, если нет воды?
+            </button>
+        </h2>
+        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+                Проверьте, нет ли объявлений о плановых отключениях на нашем сайте. Если отключение аварийное — позвоните в диспетчерскую службу по телефону +7 (4722) 23-02-23. Наша аварийная бригада работает круглосуточно.
+            </div>
+        </div>
+    </div>
+    
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                Как оплатить квитанцию?
+            </button>
+        </h2>
+        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+                Оплатить услуги можно через личный кабинет, в отделениях банков, через терминалы, а также с помощью мобильного приложения. При оплате онлайн комиссия не взимается.
+            </div>
+        </div>
+    </div>
+    
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                Как вызвать сантехника?
+            </button>
+        </h2>
+        <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+                Вы можете оставить заявку на вызов сантехника через наш сайт в разделе «Каталог услуг». Выберите нужную услугу, укажите удобное время, и наш специалист приедет к вам.
+            </div>
+        </div>
+    </div>
+    
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
+                Где находится ваш офис?
+            </button>
+        </h2>
+        <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+                Наш главный офис находится по адресу: г. Белгород, ул. 5 Августа, 5. Часы работы: Пн-Пт с 8:30 до 19:00, Сб-Вс — выходной.
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

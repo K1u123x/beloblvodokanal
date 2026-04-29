@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+{% block title %}Бронирование услуги{% endblock %}
+{% block extra_css %}
+<style>
+    .time-slot {
+        display: inline-block;
+        margin: 5px;
+        padding: 8px 16px;
+        border: 1px solid var(--border-color);
+        border-radius: 2rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        color: var(--text-color);
+        background-color: var(--card-bg);
+    }
+    .time-slot.available {
+        background-color: var(--badge-bg);
+        border-color: var(--primary-light, #00aeef);
+        color: var(--text-color);
+    }
+    .time-slot.available:hover {
+        background-color: var(--primary);
+        color: white;
+        border-color: var(--primary);
+        transform: scale(1.05);
+    }
+    .time-slot.selected {
+        background-color: var(--primary);
+        color: white;
+        border-color: var(--primary);
+        box-shadow: 0 4px 12px rgba(0, 84, 166, 0.3);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <button onclick="history.back()" class="btn btn-outline-secondary rounded-pill">
+        <i class="bi bi-arrow-left"></i> Назад
+    </button>
+</div>
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h4>Бронирование услуги: {{ service.name }}</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" id="bookingForm">
+                    {{ form.hidden_tag() }}
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            {{ form.last_name.label(class="form-label") }}
+                            {{ form.last_name(class="form-control" + (" is-invalid" if form.last_name.errors else "")) }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            {{ form.first_name.label(class="form-label") }}
+                            {{ form.first_name(class="form-control") }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            {{ form.patronymic.label(class="form-label") }}
+                            {{ form.patronymic(class="form-control") }}
+                        </div>
+                    </div>
+                    
+                    <!-- Адрес -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.city_id.label(class="form-label") }}
+                            {{ form.city_id(class="form-select") }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.street.label(class="form-label") }}
+                            {{ form.street(class="form-control") }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.house.label(class="form-label") }}
+                            {{ form.house(class="form-control") }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.apartment.label(class="form-label") }}
+                            {{ form.apartment(class="form-control") }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.description.label(class="form-label") }}
+                        {{ form.description(class="form-control", rows=3) }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.service_id.label(class="form-label") }}
+                        {{ form.service_id(class="form-select") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.scheduled_date.label(class="form-label") }}
+                        <input type="date" name="scheduled_date" id="scheduled_date" class="form-control" 
+                            value="{{ form.scheduled_date.data or '' }}" 
+                            min="{{ now.strftime('%Y-%m-%d') }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Доступное время</label>
+                        <div id="time-slots"></div>
+                        <input type="hidden" name="scheduled_time_start" id="selected_time" value="{{ form.scheduled_time_start.data or '' }}">
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">Забронировать</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    var slotsDiv = $('#time-slots');
+    var submitBtn = $('#submitBtn');
+    var selectedTimeInput = $('#selected_time');
+
+    function updateSubmitButton() {
+        if ($('.time-slot.selected').length > 0) {
+            submitBtn.prop('disabled', false);
+        } else {
+            submitBtn.prop('disabled', true);
+        }
+    }
+
+    submitBtn.prop('disabled', true);
+    
+    $('#scheduled_date').change(function() {
+        var date = $(this).val();
+        var service_id = $('#service_id').val();
+
+        slotsDiv.empty();
+        selectedTimeInput.val('');
+        submitBtn.prop('disabled', true);
+        
+        if (date && service_id) {
+            slotsDiv.html('<div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div><span>Загрузка доступного времени...</span>');
+            
+            $.getJSON('/user/get_slots/' + service_id + '/' + date, function(data) {
+                slotsDiv.empty();
+                
+                if (data.length === 0) {
+                    slotsDiv.html('<div class="alert alert-warning py-2"><i class="bi bi-exclamation-triangle me-2"></i>Нет доступного времени на выбранную дату.</div>');
+                    submitBtn.prop('disabled', true);
+                    return;
+                }
+                
+                // Фильтруем прошедшее время для сегодняшней даты
+                var today = new Date();
+                var selectedDate = new Date(date);
+                var isToday = selectedDate.toDateString() === today.toDateString();
+                var currentHour = today.getHours();
+                var currentMinute = today.getMinutes();
+                
+                var availableSlots = data.filter(function(slot) {
+                    if (!isToday) return true;
+                    
+                    var slotParts = slot.split(':');
+                    var slotHour = parseInt(slotParts[0]);
+                    var slotMinute = parseInt(slotParts[1]);
+                    
+                    if (slotHour > currentHour) return true;
+                    if (slotHour === currentHour && slotMinute > currentMinute) return true;
+                    return false;
+                });
+                
+                if (availableSlots.length === 0) {
+                    slotsDiv.html('<div class="alert alert-warning py-2"><i class="bi bi-clock-history me-2"></i>На сегодня доступное время закончилось. Выберите другой день.</div>');
+                    submitBtn.prop('disabled', true);
+                    return;
+                }
+                
+                slotsDiv.append('<p class="text-success small mb-2"><i class="bi bi-check-circle me-1"></i>Доступно слотов: ' + availableSlots.length + '</p>');
+                
+                $.each(availableSlots, function(i, slot) {
+                    var slotElement = $('<span class="time-slot available">' + slot + '</span>');
+                    slotElement.click(function() {
+                        $('.time-slot').removeClass('selected');
+                        $(this).addClass('selected');
+                        selectedTimeInput.val(slot);
+                        updateSubmitButton();
+                    });
+                    slotsDiv.append(slotElement);
+                });
+                
+                updateSubmitButton();
+            }).fail(function() {
+                slotsDiv.html('<div class="alert alert-danger py-2"><i class="bi bi-exclamation-triangle me-2"></i>Ошибка загрузки времени. Попробуйте снова.</div>');
+                submitBtn.prop('disabled', true);
+            });
+        } else {
+            slotsDiv.html('<p class="text-muted">Выберите дату, чтобы увидеть доступное время</p>');
+        }
+    });
+
+    if ($('#scheduled_date').val()) {
+        $('#scheduled_date').trigger('change');
+    } else {
+        slotsDiv.html('<p class="text-muted">Выберите дату, чтобы увидеть доступное время</p>');
+    }
+
+    $('#bookingForm').on('submit', function(e) {
+        if (!selectedTimeInput.val()) {
+            e.preventDefault();
+            alert('Пожалуйста, выберите время из доступных слотов.');
+            return false;
+        }
+    });
+});
+</script>
+{% endblock %}

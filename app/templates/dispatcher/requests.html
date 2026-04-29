@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+{% block title %}Все заявки{% endblock %}
+{% block content %}
+
+<div class="mb-3">
+    <button onclick="history.back()" class="btn btn-outline-secondary rounded-pill">
+        <i class="bi bi-arrow-left"></i> Назад
+    </button>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold"><i class="bi bi-list-ul me-2"></i>Все заявки</h2>
+    <a href="{{ url_for('dispatcher.dashboard') }}" class="btn btn-outline-primary rounded-pill">
+        <i class="bi bi-speedometer2 me-2"></i>Дашборд
+    </a>
+</div>
+
+<!-- Вкладки статусов -->
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item">
+        <a class="nav-link {% if current_status == 'pending' %}active{% endif %}" 
+           href="{{ url_for('dispatcher.requests_list', status='pending') }}">
+            <i class="bi bi-clock-history me-1"></i>Ожидают
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if current_status == 'assigned' %}active{% endif %}" 
+           href="{{ url_for('dispatcher.requests_list', status='assigned') }}">
+            <i class="bi bi-person-check me-1"></i>Назначены
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if current_status == 'in_progress' %}active{% endif %}" 
+           href="{{ url_for('dispatcher.requests_list', status='in_progress') }}">
+            <i class="bi bi-gear me-1"></i>В работе
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if current_status == 'completed' %}active{% endif %}" 
+           href="{{ url_for('dispatcher.requests_list', status='completed') }}">
+            <i class="bi bi-check-circle me-1"></i>Выполнены
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if current_status == 'rejected' %}active{% endif %}" 
+           href="{{ url_for('dispatcher.requests_list', status='rejected') }}">
+            <i class="bi bi-x-circle me-1"></i>Отклонены
+        </a>
+    </li>
+</ul>
+
+<!-- Фильтры и поиск -->
+<div class="card mb-4 shadow-sm">
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label small fw-bold text-muted">🔍 Поиск</label>
+                <input type="text" id="requestSearch" class="form-control rounded-pill" 
+                       placeholder="По услуге, клиенту или адресу...">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-bold text-muted">🏙️ Город</label>
+                <select id="cityFilter" class="form-select rounded-pill">
+                    <option value="all">Все города</option>
+                    <option value="Губкин">Губкин</option>
+                    <option value="Старый Оскол">Старый Оскол</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-bold text-muted">📅 Дата</label>
+                <select id="dateFilter" class="form-select rounded-pill">
+                    <option value="all">Все даты</option>
+                    <option value="today">Сегодня</option>
+                    <option value="tomorrow">Завтра</option>
+                    <option value="week">Эта неделя</option>
+                    <option value="past">Прошедшие</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button class="btn btn-outline-secondary rounded-pill w-100" id="resetFilters">
+                    <i class="bi bi-arrow-counterclockwise"></i> Сбросить
+                </button>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-12">
+                <span class="text-muted small" id="requestCount">
+                    <i class="bi bi-database me-1"></i>Всего: <span id="totalCount">{{ requests|length }}</span> заявок
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Таблица заявок -->
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        {% if requests %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="requestsTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>№</th>
+                        <th>Услуга</th>
+                        <th>Клиент</th>
+                        <th>Город</th>
+                        <th>Адрес</th>
+                        <th>Дата</th>
+                        <th>Время</th>
+                        <th>Статус</th>
+                        <th>Работник</th>
+                        <th style="width: 50px;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for req in requests %}
+                    <tr data-city="{{ req.city.name if req.city else '' }}" 
+                        data-date="{{ req.scheduled_date.strftime('%Y-%m-%d') if req.scheduled_date else '' }}">
+                        <td><span class="badge bg-secondary">#{{ req.id }}</span></td>
+                        <td class="service-name">{{ req.service.name|truncate(20) }}</td>
+                        <td class="client-name">{{ req.client.user.full_name|truncate(15) if req.client and req.client.user else '—' }}</td>
+                        <td class="city-name">{{ req.city.name if req.city else '—' }}</td>
+                        <td class="address">{{ req.street }}, д.{{ req.house }}</td>
+                        <td class="date">{{ req.scheduled_date.strftime('%d.%m.%Y') if req.scheduled_date else '—' }}</td>
+                        <td>{{ req.scheduled_time_start.strftime('%H:%M') if req.scheduled_time_start else '—' }}</td>
+                        <td>
+                            <span class="badge bg-{{ req.status.color if req.status else 'secondary' }}">
+                                {{ req.status_ru }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if req.worker %}
+                            <a href="{{ url_for('index.worker_profile', worker_id=req.worker.id) }}" target="_blank" class="text-decoration-none">
+                                {{ req.worker.full_name|truncate(12) }}
+                            </a>
+                            {% else %}
+                            —
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <a href="{{ url_for('dispatcher.request_detail', request_id=req.id) }}" 
+                               class="btn btn-sm btn-outline-primary rounded-circle" 
+                               style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;"
+                               title="Подробнее">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-inbox display-4 text-muted opacity-50"></i>
+            <p class="text-muted mt-3">Нет заявок с выбранным статусом</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    var today = new Date().toISOString().split('T')[0];
+    var tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+    var totalRequests = parseInt($('#totalCount').text()) || 0;
+    
+    function getWeekStart() {
+        var d = new Date();
+        var day = d.getDay();
+        var diff = d.getDate() - day + (day === 0 ? -6 : 1);
+        return new Date(d.setDate(diff)).toISOString().split('T')[0];
+    }
+    
+    function filterTable() {
+        var searchText = $('#requestSearch').val().toLowerCase();
+        var cityFilter = $('#cityFilter').val();
+        var dateFilter = $('#dateFilter').val();
+        var visibleCount = 0;
+        
+        $('#requestsTable tbody tr').each(function() {
+            var row = $(this);
+            var service = row.find('.service-name').text().toLowerCase();
+            var client = row.find('.client-name').text().toLowerCase();
+            var address = row.find('.address').text().toLowerCase();
+            var city = row.find('.city-name').text();
+            var dateStr = row.data('date');
+            
+            var matchesSearch = searchText === '' || 
+                service.indexOf(searchText) > -1 || 
+                client.indexOf(searchText) > -1 || 
+                address.indexOf(searchText) > -1;
+            
+            var matchesCity = cityFilter === 'all' || city === cityFilter;
+            
+            var matchesDate = true;
+            if (dateFilter === 'today') {
+                matchesDate = dateStr === today;
+            } else if (dateFilter === 'tomorrow') {
+                matchesDate = dateStr === tomorrow;
+            } else if (dateFilter === 'week') {
+                matchesDate = dateStr >= getWeekStart() && dateStr <= tomorrow;
+            } else if (dateFilter === 'past') {
+                matchesDate = dateStr < today;
+            }
+            
+            if (matchesSearch && matchesCity && matchesDate) {
+                row.show();
+                visibleCount++;
+            } else {
+                row.hide();
+            }
+        });
+        
+        $('#requestCount').html('<i class="bi bi-database me-1"></i>Найдено: ' + visibleCount + ' из ' + totalRequests + ' заявок');
+    }
+    
+    $('#requestSearch').on('keyup', filterTable);
+    $('#cityFilter').on('change', filterTable);
+    $('#dateFilter').on('change', filterTable);
+    
+    $('#resetFilters').click(function() {
+        $('#requestSearch').val('');
+        $('#cityFilter').val('all');
+        $('#dateFilter').val('all');
+        filterTable();
+    });
+});
+</script>
+{% endblock %}

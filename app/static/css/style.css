@@ -1,0 +1,1410 @@
+/* Современный дизайн БелОблВодоканал */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+    --primary: #0054a6;
+    --primary-dark: #003d7a;
+    --primary-light: #00aeef;
+    --secondary: #6c757d;
+    --bg-light: #f4f7fc;
+    --border-radius: 1rem;
+    --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    --card-shadow: 0 20px 40px -10px rgba(0, 84, 166, 0.1);
+}
+
+* {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+    background: var(--bg-light);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1;
+}
+
+/* Навбар */
+.navbar {
+    background: linear-gradient(135deg, #003d7a 0%, #0054a6 100%) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 0.75rem 0;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.8rem;
+    letter-spacing: -0.02em;
+}
+
+/* Кнопки */
+.btn {
+    border-radius: 3rem;
+    padding: 0.6rem 1.8rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background: var(--primary);
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 84, 166, 0.3);
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 84, 166, 0.4);
+}
+
+.btn-outline-primary {
+    color: var(--primary);
+    border-color: var(--primary);
+}
+
+.btn-outline-primary:hover {
+    background: var(--primary);
+    color: white;
+}
+
+/* Карточки */
+.card {
+    border: none;
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    transition: transform 0.2s, box-shadow 0.2s;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 30px 50px -15px rgba(0, 84, 166, 0.2);
+}
+
+/* Заголовки */
+h1, h2, h3, h4, h5 {
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+h2 {
+    position: relative;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+h2:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 4px;
+    background: var(--primary-light);
+    border-radius: 4px;
+}
+
+/* Поля ввода */
+.form-control, .form-select {
+    border-radius: 2rem;
+    border: 1px solid #e2e8f0;
+    padding: 0.6rem 1.2rem;
+    background-color: white;
+    transition: all 0.2s;
+}
+
+.form-control:focus {
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 4px rgba(0, 174, 239, 0.2);
+}
+
+/* Таблицы */
+.table {
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    margin-bottom: 0;
+}
+
+.table thead th {
+    background-color: #f1f5f9;
+    color: #1e293b;
+    font-weight: 600;
+    border-bottom: none;
+    padding: 1rem;
+}
+
+.table tbody td {
+    padding: 1rem;
+    vertical-align: middle;
+}
+
+/* Чат */
+.chat-container {
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    overflow: hidden;
+}
+
+.chat-messages {
+    height: 450px;
+    overflow-y: auto;
+    padding: 1.5rem;
+    background: var(--chat-bg);
+}
+
+.message-bubble {
+    display: flex;
+    margin-bottom: 1rem;
+    align-items: flex-end;
+}
+
+.message-bubble.outgoing {
+    justify-content: flex-end;
+}
+
+.message-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
+.message-bubble.outgoing .message-avatar {
+    order: 2;
+    margin-right: 0;
+    margin-left: 12px;
+    background: var(--secondary);
+}
+
+.message-content {
+    max-width: 70%;
+    background: var(--chat-message-in);
+    color: var(--text-color);
+    padding: 0.75rem 1rem;
+    border-radius: 18px;
+    border-top-left-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    position: relative;
+}
+
+.message-bubble.outgoing .message-content {
+    background: var(--chat-message-out);
+    color: white;
+    border-top-left-radius: 18px;
+    border-top-right-radius: 4px;
+}
+
+.message-time {
+    font-size: 0.7rem;
+    opacity: 0.7;
+    margin-top: 4px;
+    display: block;
+}
+/* Адаптив */
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 1.4rem;
+    }
+    .container {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+}
+
+/* Toast-уведомления */
+.toast {
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border-radius: 1rem !important;
+}
+.toast.show {
+  opacity: 1;
+}
+.toast .btn-close {
+  filter: brightness(0) invert(1);
+}
+
+/* Верхняя информационная панель */
+.top-bar {
+  background: linear-gradient(145deg, #f8fafc 0%, #ffffff 100%);
+  border-bottom: 1px solid rgba(0, 84, 166, 0.1);
+  font-size: 0.9rem;
+  color: #1e293b;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+
+.top-bar i {
+  margin-right: 0.3rem;
+  color: var(--primary);
+}
+
+/* Футер */
+.footer {
+  background: linear-gradient(145deg, #0b1e33 0%, #0a1622 100%);
+  color: #e2e8f0;
+  border-top: 4px solid var(--primary-light);
+}
+
+.footer h5, .footer h6 {
+  color: white;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.footer a {
+  color: #a0c4e2;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footer a:hover {
+  color: white;
+  text-decoration: underline;
+}
+
+.footer .list-unstyled li {
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.footer .bi {
+  margin-right: 0.5rem;
+  color: var(--primary-light);
+}
+
+.footer hr {
+  opacity: 0.2;
+  margin: 1.5rem 0 1rem;
+}
+
+.footer .small {
+  color: #94a3b8;
+}
+
+/* Адаптив для футера */
+@media (max-width: 768px) {
+  .footer {
+    text-align: center;
+  }
+  .footer .list-unstyled {
+    margin-bottom: 1.5rem;
+  }
+}
+
+.theme-btn.active {
+  background-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+}
+
+.theme-switcher .btn {
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 2px;
+    transition: all 0.2s ease;
+}
+
+/* На мобильных устройствах кнопки чуть меньше */
+@media (max-width: 768px) {
+    .theme-switcher .btn {
+        width: 32px;
+        height: 32px;
+    }
+}
+
+.theme-btn.active {
+    background-color: rgba(255, 255, 255, 0.25) !important;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+    transform: scale(1.05);
+}
+
+.theme-btn:hover {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    transform: scale(1.05);
+}
+
+.footer {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.footer.footer-visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.admin-menu-card {
+    transition: all 0.2s ease-in-out;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.admin-menu-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 84, 166, 0.1);
+    border-color: var(--primary-light);
+}
+
+.admin-menu-card i {
+    transition: transform 0.2s;
+}
+
+.admin-menu-card:hover i {
+    transform: scale(1.1);
+}
+
+.news-card {
+    transition: all 0.3s ease;
+    border: none;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.news-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 30px rgba(0, 84, 166, 0.15);
+}
+
+.news-card .card-title {
+    transition: color 0.2s;
+}
+
+.news-card:hover .card-title {
+    color: var(--primary) !important;
+}
+
+.news-content p {
+    margin-bottom: 1rem;
+}
+
+.news-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+main {
+    animation: fadeInContent 0.4s ease-out;
+}
+
+@keyframes fadeInContent {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card {
+    animation: cardAppear 0.5s ease-out forwards;
+    opacity: 0; /* начальное состояние для анимации */
+    animation-delay: calc(var(--animation-order, 0) * 0.05s);
+}
+
+@keyframes cardAppear {
+    from {
+        opacity: 0;
+        transform: scale(0.98) translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.admin-menu-card, .table, .card-body .card {
+    animation: none;
+    opacity: 1;
+}
+
+.toast {
+    overflow: hidden;
+    position: relative;
+}
+
+.toast::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.3);
+    animation: toastProgress 4s linear forwards;
+}
+
+@keyframes toastProgress {
+    from { width: 100%; }
+    to { width: 0%; }
+}
+
+.btn, .dropdown-item, .nav-link, .pagination .page-link {
+    transition: all 0.25s ease !important;
+}
+
+.btn:active {
+    transform: scale(0.97) !important;
+}
+
+.pulse {
+    animation: pulse-ring 2s infinite;
+}
+
+@keyframes pulse-ring {
+    0% {
+        box-shadow: 0 0 0 0 rgba(0, 84, 166, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(0, 84, 166, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(0, 84, 166, 0);
+    }
+}
+
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+    border-radius: 8px;
+    height: 20px;
+    margin-bottom: 10px;
+}
+
+@keyframes skeleton-loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+@media (max-width: 991px) {
+    .navbar-collapse {
+        padding: 1rem 0;
+    }
+    
+    .navbar-nav {
+        gap: 0.5rem;
+    }
+    
+    .theme-switcher {
+        margin: 0.5rem 0;
+        justify-content: center;
+    }
+    
+    .nav-item.dropdown .dropdown-menu {
+        background-color: transparent;
+        border: none;
+        padding-left: 1rem;
+    }
+    
+    .nav-item.dropdown .dropdown-item {
+        color: rgba(255, 255, 255, 0.8) !important;
+    }
+    
+    .nav-item.dropdown .dropdown-item:hover {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        color: white !important;
+    }
+}
+
+.review-card {
+    transition: all 0.3s ease;
+    border-left: 4px solid var(--primary);
+}
+
+.review-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 84, 166, 0.1);
+}
+
+.review-card .fst-italic {
+    color: var(--text-color);
+    opacity: 0.9;
+}
+
+.request-card {
+    transition: all 0.2s ease;
+    border: 1px solid var(--border-color);
+}
+
+.request-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 15px 25px rgba(0, 84, 166, 0.1);
+    border-color: var(--primary-light);
+}
+
+.request-card .progress {
+    border-radius: 10px;
+    background-color: var(--progress-bg);
+}
+
+.news-detail-image {
+    max-height: 500px;
+    width: 100%;
+    object-fit: contain;
+    background-color: var(--card-bg);
+}
+
+.news-card-img {
+    height: 200px;
+    width: 100%;
+    object-fit: cover;
+    background-color: var(--card-bg);
+}
+
+.hero-section {
+    border: 2px solid rgba(0, 84, 166, 0.15) !important;
+    box-shadow: 0 8px 25px rgba(0, 84, 166, 0.1) !important;
+}
+
+.hero-section h1 {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+}
+
+.hero-section .lead {
+    font-weight: 500 !important;
+}
+
+input[type="date"] {
+    cursor: pointer;
+    position: relative;
+    min-height: 45px;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}
+
+/* Для Firefox */
+input[type="date"] {
+    color-scheme: light;
+}
+
+[data-theme="dark"] input[type="date"] {
+    color-scheme: dark;
+}
+
+/* Фикс для круглых аватарок — чтобы не растягивались в овалы */
+.rounded-circle {
+    aspect-ratio: 1/1 !important;
+    flex-shrink: 0 !important;
+}
+
+/* Для аватарок внутри flex-контейнеров */
+.d-flex .rounded-circle {
+    aspect-ratio: 1/1 !important;
+    flex-shrink: 0 !important;
+}
+
+/* Адаптив для футера */
+@media (max-width: 768px) {
+    .footer {
+        text-align: center;
+    }
+    .footer .list-unstyled {
+        margin-bottom: 1.5rem;
+    }
+}
+
+.theme-btn.active {
+    background-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+}
+
+.theme-switcher .btn {
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 2px;
+    transition: all 0.2s ease;
+}
+
+/* На мобильных устройствах кнопки чуть меньше */
+@media (max-width: 768px) {
+    .theme-switcher .btn {
+        width: 32px;
+        height: 32px;
+    }
+}
+
+.theme-btn.active {
+    background-color: rgba(255, 255, 255, 0.25) !important;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+    transform: scale(1.05);
+}
+
+.theme-btn:hover {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    transform: scale(1.05);
+}
+
+.footer {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.footer.footer-visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.admin-menu-card {
+    transition: all 0.2s ease-in-out;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.admin-menu-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 84, 166, 0.1);
+    border-color: var(--primary-light);
+}
+
+.admin-menu-card i {
+    transition: transform 0.2s;
+}
+
+.admin-menu-card:hover i {
+    transform: scale(1.1);
+}
+
+.news-card {
+    transition: all 0.3s ease;
+    border: none;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.news-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 30px rgba(0, 84, 166, 0.15);
+}
+
+.news-card .card-title {
+    transition: color 0.2s;
+}
+
+.news-card:hover .card-title {
+    color: var(--primary) !important;
+}
+
+.news-content p {
+    margin-bottom: 1rem;
+}
+
+.news-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+main {
+    animation: fadeInContent 0.4s ease-out;
+}
+
+@keyframes fadeInContent {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card {
+    animation: cardAppear 0.5s ease-out forwards;
+    opacity: 0;
+    animation-delay: calc(var(--animation-order, 0) * 0.05s);
+}
+
+@keyframes cardAppear {
+    from {
+        opacity: 0;
+        transform: scale(0.98) translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.admin-menu-card, .table, .card-body .card {
+    animation: none;
+    opacity: 1;
+}
+
+.toast {
+    overflow: hidden;
+    position: relative;
+}
+
+.toast::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.3);
+    animation: toastProgress 4s linear forwards;
+}
+
+@keyframes toastProgress {
+    from { width: 100%; }
+    to { width: 0%; }
+}
+
+.btn, .dropdown-item, .nav-link, .pagination .page-link {
+    transition: all 0.25s ease !important;
+}
+
+.btn:active {
+    transform: scale(0.97) !important;
+}
+
+.pulse {
+    animation: pulse-ring 2s infinite;
+}
+
+@keyframes pulse-ring {
+    0% {
+        box-shadow: 0 0 0 0 rgba(0, 84, 166, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(0, 84, 166, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(0, 84, 166, 0);
+    }
+}
+
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+    border-radius: 8px;
+    height: 20px;
+    margin-bottom: 10px;
+}
+
+@keyframes skeleton-loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+@media (max-width: 991px) {
+    .navbar-collapse {
+        padding: 1rem 0;
+    }
+    
+    .navbar-nav {
+        gap: 0.5rem;
+    }
+    
+    .theme-switcher {
+        margin: 0.5rem 0;
+        justify-content: center;
+    }
+    
+    .nav-item.dropdown .dropdown-menu {
+        background-color: transparent;
+        border: none;
+        padding-left: 1rem;
+    }
+    
+    .nav-item.dropdown .dropdown-item {
+        color: rgba(255, 255, 255, 0.8) !important;
+    }
+    
+    .nav-item.dropdown .dropdown-item:hover {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        color: white !important;
+    }
+}
+
+.review-card {
+    transition: all 0.3s ease;
+    border-left: 4px solid var(--primary);
+}
+
+.review-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 84, 166, 0.1);
+}
+
+.review-card .fst-italic {
+    color: var(--text-color);
+    opacity: 0.9;
+}
+
+.request-card {
+    transition: all 0.2s ease;
+    border: 1px solid var(--border-color);
+}
+
+.request-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 15px 25px rgba(0, 84, 166, 0.1);
+    border-color: var(--primary-light);
+}
+
+.request-card .progress {
+    border-radius: 10px;
+    background-color: var(--progress-bg);
+}
+
+.news-detail-image {
+    max-height: 500px;
+    width: 100%;
+    object-fit: contain;
+    background-color: var(--card-bg);
+}
+
+.news-card-img {
+    height: 200px;
+    width: 100%;
+    object-fit: cover;
+    background-color: var(--card-bg);
+}
+
+.hero-section {
+    border: 2px solid rgba(0, 84, 166, 0.15) !important;
+    box-shadow: 0 8px 25px rgba(0, 84, 166, 0.1) !important;
+}
+
+.hero-section h1 {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+}
+
+.hero-section .lead {
+    font-weight: 500 !important;
+}
+
+input[type="date"] {
+    cursor: pointer;
+    position: relative;
+    min-height: 45px;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}
+
+input[type="date"] {
+    color-scheme: light;
+}
+
+[data-theme="dark"] input[type="date"] {
+    color-scheme: dark;
+}
+
+/* ========================================
+   СТИЛИ ДЛЯ ЧАТА
+   ======================================== */
+
+.chat-container {
+    background: var(--card-bg);
+    border-radius: 1.5rem;
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+.chat-header {
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    border-bottom: none;
+}
+
+.chat-header h5 {
+    color: white;
+    margin: 0;
+}
+
+.chat-header small {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.chat-messages {
+    height: 450px;
+    overflow-y: auto;
+    padding: 1.5rem;
+    background: var(--chat-bg);
+    display: flex;
+    flex-direction: column;
+}
+
+.message-wrapper {
+    display: flex;
+    margin-bottom: 1.25rem;
+    animation: messageSlideIn 0.3s ease-out;
+}
+
+@keyframes messageSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.message-wrapper.outgoing {
+    justify-content: flex-end;
+}
+
+.message-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    margin-right: 12px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.message-wrapper.outgoing .message-avatar {
+    order: 2;
+    margin-right: 0;
+    margin-left: 12px;
+}
+
+/* Цвета аватарок по ролям */
+.avatar-client {
+    background: linear-gradient(135deg, #6c757d, #495057);
+    color: white;
+}
+
+.avatar-worker {
+    background: linear-gradient(135deg, #0054a6, #003d7a);
+    color: white;
+}
+
+.avatar-dispatcher {
+    background: linear-gradient(135deg, #ffc107, #e6a800);
+    color: #000;
+}
+
+.avatar-admin {
+    background: linear-gradient(135deg, #dc3545, #b02a37);
+    color: white;
+}
+
+/* Бейдж роли на аватарке */
+.message-avatar .role-badge {
+    position: absolute;
+    bottom: -3px;
+    right: -3px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 800;
+    border: 2px solid var(--card-bg);
+    background: var(--primary);
+    color: white;
+}
+
+.message-content {
+    max-width: 65%;
+    padding: 0.9rem 1.2rem;
+    border-radius: 20px;
+    position: relative;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.message-wrapper:not(.outgoing) .message-content {
+    background: var(--chat-message-in);
+    color: var(--text-color);
+    border-top-left-radius: 6px;
+    border: 1px solid var(--border-color);
+}
+
+.message-wrapper.outgoing .message-content {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    border-top-right-radius: 6px;
+}
+
+.message-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 6px;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.message-author {
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.message-wrapper:not(.outgoing) .message-author {
+    color: var(--primary);
+}
+
+.message-wrapper.outgoing .message-author {
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.message-role-tag {
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.message-wrapper:not(.outgoing) .message-role-tag {
+    background: var(--badge-bg);
+    color: var(--badge-text);
+}
+
+.message-wrapper.outgoing .message-role-tag {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.message-text {
+    line-height: 1.5;
+    word-break: break-word;
+    font-size: 0.95rem;
+}
+
+.message-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 8px;
+    gap: 6px;
+}
+
+.message-time {
+    font-size: 0.7rem;
+    opacity: 0.8;
+}
+
+.message-wrapper:not(.outgoing) .message-time {
+    color: var(--muted-text);
+}
+
+.message-wrapper.outgoing .message-time {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.message-status {
+    font-size: 0.7rem;
+}
+
+.message-wrapper.outgoing .message-status {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Чат-инпут */
+.chat-footer {
+    padding: 1rem 1.5rem;
+    background: var(--card-bg);
+    border-top: 1px solid var(--border-color);
+}
+
+.chat-footer .input-group {
+    background: var(--input-bg);
+    border-radius: 3rem;
+    padding: 0.25rem;
+    border: 1px solid var(--border-color);
+}
+
+.chat-footer .form-control {
+    border: none;
+    background: transparent;
+    border-radius: 3rem;
+    padding: 0.7rem 1.2rem;
+    resize: none;
+}
+
+.chat-footer .form-control:focus {
+    box-shadow: none;
+}
+
+.chat-footer .btn {
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 3px;
+}
+
+/* Скроллбар для чата */
+.chat-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 10px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb:hover {
+    background: var(--muted-text);
+}
+
+/* Дата-разделитель */
+.chat-date-divider {
+    text-align: center;
+    margin: 1.5rem 0;
+    position: relative;
+}
+
+.chat-date-divider span {
+    background: var(--badge-bg);
+    color: var(--badge-text);
+    padding: 0.3rem 1rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 1px solid var(--border-color);
+}
+
+/* Пустое состояние */
+.chat-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--muted-text);
+}
+
+.chat-empty i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.3;
+}
+
+/* Адаптив */
+@media (max-width: 768px) {
+    .message-content {
+        max-width: 80%;
+        padding: 0.7rem 1rem;
+    }
+    
+    .message-avatar {
+        width: 36px;
+        height: 36px;
+        font-size: 0.9rem;
+    }
+    
+    .chat-messages {
+        padding: 1rem;
+    }
+}
+
+.lightbox-modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.95);
+    cursor: zoom-out;
+}
+
+.lightbox-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    animation: lightboxFadeIn 0.3s ease;
+}
+
+@keyframes lightboxFadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -45%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
+
+.lightbox-close {
+    position: absolute;
+    top: 20px;
+    right: 35px;
+    color: #fff;
+    font-size: 50px;
+    font-weight: 300;
+    cursor: pointer;
+    z-index: 10000;
+    transition: opacity 0.2s;
+    opacity: 0.8;
+}
+
+.lightbox-close:hover {
+    opacity: 1;
+}
+
+.lightbox-caption {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #fff;
+    font-size: 1rem;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 8px 20px;
+    border-radius: 30px;
+    backdrop-filter: blur(5px);
+}
+
+.review-photo-wrapper {
+    transition: all 0.2s ease;
+}
+
+.review-photo-wrapper:hover {
+    transform: translateY(-2px);
+}
+
+/* Для мобильных */
+@media (max-width: 768px) {
+    .lightbox-close {
+        top: 10px;
+        right: 20px;
+        font-size: 40px;
+    }
+    
+    .lightbox-caption {
+        font-size: 0.8rem;
+        padding: 6px 15px;
+    }
+}
+
+/* Карточки отзывов */
+.review-card {
+    transition: all 0.3s ease;
+    border-left: 4px solid var(--primary);
+}
+
+.review-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 84, 166, 0.1);
+}
+
+.review-card .fst-italic {
+    color: var(--text-color);
+    opacity: 0.9;
+    line-height: 1.6;
+}
+
+.review-photo-wrapper {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.review-photo-wrapper:hover {
+    box-shadow: 0 8px 20px rgba(0, 84, 166, 0.2);
+}
+
+/* Фикс для круглых аватарок — чтобы не растягивались в овалы */
+.rounded-circle {
+    aspect-ratio: 1/1 !important;
+    flex-shrink: 0 !important;
+}
+
+/* Для аватарок внутри flex-контейнеров */
+.d-flex .rounded-circle {
+    aspect-ratio: 1/1 !important;
+    flex-shrink: 0 !important;
+}
+
+.rounded-circle,
+[class*="rounded-circle"],
+.message-avatar,
+.role-badge {
+    aspect-ratio: 1/1 !important;
+    flex-shrink: 0 !important;
+}
+
+.d-flex .rounded-circle,
+.d-flex [class*="rounded-circle"] {
+    aspect-ratio: 1/1 !important;
+    flex-shrink: 0 !important;
+    min-width: fit-content;
+}
