@@ -94,7 +94,7 @@ def assign_worker(request_id):
     if request.method == 'GET' and request.args.get('worker_id'):
         try:
             worker_id_from_url = int(request.args.get('worker_id'))
-            worker = WorkerProfile.query.get(worker_id_from_url)
+            worker = db.session.get(WorkerProfile, worker_id_from_url)
             if worker and not worker.user.is_blocked and worker in eligible_workers:
                 busy = Request.query.filter(
                     Request.worker_id == worker.id,
@@ -125,7 +125,7 @@ def assign_worker(request_id):
             pass
 
     if form.validate_on_submit():
-        worker = WorkerProfile.query.get(form.worker_id.data)
+        worker = db.session.get(WorkerProfile, form.worker_id.data)
         if worker and not worker.user.is_blocked:
             busy = Request.query.filter(
                 Request.worker_id == worker.id,

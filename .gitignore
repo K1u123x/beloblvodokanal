@@ -21,3 +21,5 @@ desktop.ini
 *~
 instance/
 routes_old.py
+tests/test_selenium.py
+config.py

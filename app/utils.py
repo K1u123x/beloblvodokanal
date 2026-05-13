@@ -1,7 +1,7 @@
 """
 Слоты, SVD++, загрузка фото, цензура, сброс пароля
 """
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta, date, timezone
 import datetime as dt
 from app.models import Request, Service, WorkerProfile, Review, User, Client
 from surprise import SVDpp, Dataset, Reader
@@ -36,7 +36,7 @@ def get_available_slots(service_id, selected_date):
     Возвращает свободные слоты для услуги на дату
     Слот доступен, если хотя бы один незаблокированный работник с нужной услугой не занят
     """
-    service = Service.query.get(service_id)
+    service = db.session.get(Service, service_id)
     if not service:
         return []
 
@@ -83,7 +83,7 @@ def calculate_worker_rating(worker_id):
     reviews = Review.query.filter_by(worker_id=worker_id).all()
     if reviews:
         avg = sum(r.rating for r in reviews) / len(reviews)
-        worker = WorkerProfile.query.get(worker_id)
+        worker = db.session.get(WorkerProfile, worker_id)
         if worker:
             worker.rating = avg
             db.session.commit()
@@ -148,7 +148,7 @@ def send_password_reset_email(user):
     """Выводит ссылку для сброса пароля в консоль сервера (демо-режим)"""
     token = generate_reset_token(user.email)
     user.reset_password_token = token
-    user.reset_password_expires = datetime.utcnow() + timedelta(hours=1)
+    user.reset_password_expires = datetime.now(timezone.utc) + timedelta(hours=1)
     db.session.commit()
 
     reset_url = url_for('auth.reset_password', token=token, _external=True)
