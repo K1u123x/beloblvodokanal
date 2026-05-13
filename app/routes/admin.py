@@ -126,7 +126,7 @@ def create_user():
         db.session.add(user)
         db.session.flush()
 
-        role = Role.query.get(form.role_id.data)
+        role = db.session.get(Role, form.role_id.data)
         if role and role.code in ['admin', 'dispatcher', 'worker']:
             if role.code == 'worker':
                 wp = WorkerProfile(user_id=user.id, hire_date=date.today())
@@ -391,7 +391,7 @@ def export_pdf():
         return y, len(lines)
 
     p.setFont(font_name, 12)
-    p.drawString(25, height - 30, "Отчёт по заявкам БелОблВодоканал")
+    p.drawString(25, height - 30, "Отчёт по заявкам Белоблводоканал")
     p.setFont(font_name, 8)
     p.drawString(25, height - 48, f"Сформирован: {datetime.now().strftime('%d.%m.%Y %H:%M')}")
     if start:
@@ -426,7 +426,8 @@ def export_pdf():
             y -= 16
             p.setFont(font_name, 7)
 
-        city_name = City.query.get(r.city_id).name if r.city_id else ''
+        city = db.session.get(City, r.city_id) if r.city_id else None
+        city_name = city.name if city else ''
         address_full = f"{r.street}, д.{r.house}"
         if r.apartment:
             address_full += f", кв.{r.apartment}"

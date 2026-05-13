@@ -1,7 +1,7 @@
 """
 Модели базы данных: пользователи, профили, заявки, отзывы, новости
 """
-from datetime import datetime, date
+from datetime import datetime, date, timezone
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from app import db, login_manager
@@ -11,7 +11,7 @@ worker_services = db.Table(
     'worker_services',
     db.Column('worker_id', db.Integer, db.ForeignKey('worker_profile.id', ondelete='CASCADE'), primary_key=True),
     db.Column('service_id', db.Integer, db.ForeignKey('service.id', ondelete='CASCADE'), primary_key=True),
-    db.Column('assigned_at', db.DateTime, default=datetime.utcnow)
+    db.Column('assigned_at', db.DateTime, default=lambda: datetime.now(timezone.utc))
 )
 
 
@@ -23,7 +23,7 @@ class City(db.Model):
     name = db.Column(db.String(100), nullable=False, unique=True)
     region = db.Column(db.String(100), default='Белгородская область')
     is_active = db.Column(db.Boolean, default=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     def __repr__(self):
         return f'<City {self.name}>'
@@ -37,7 +37,7 @@ class Role(db.Model):
     code = db.Column(db.String(20), nullable=False, unique=True)
     name = db.Column(db.String(50), nullable=False, unique=True)
     description = db.Column(db.Text)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     users = db.relationship('User', backref='role', lazy='dynamic')
 
@@ -54,7 +54,7 @@ class RequestStatus(db.Model):
     name_ru = db.Column(db.String(50), nullable=False)
     color = db.Column(db.String(20), default='secondary')
     order = db.Column(db.Integer, default=0)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     requests = db.relationship('Request', backref='status', lazy='dynamic')
 
@@ -92,8 +92,8 @@ class User(UserMixin, db.Model):
     reset_password_token = db.Column(db.String(128))
     reset_password_expires = db.Column(db.DateTime)
 
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     client_profile = db.relationship('Client', backref='user', uselist=False, cascade='all, delete-orphan')
     worker_profile = db.relationship('WorkerProfile', backref='user', uselist=False, cascade='all, delete-orphan')
@@ -140,8 +140,8 @@ class Client(db.Model):
     street = db.Column(db.String(200))
     house = db.Column(db.String(20))
     apartment = db.Column(db.String(20))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     requests = db.relationship('Request', backref='client', lazy='dynamic')
     reviews = db.relationship('Review', backref='client', lazy='dynamic')
@@ -165,8 +165,8 @@ class DispatcherProfile(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), unique=True, nullable=False)
     city_id = db.Column(db.Integer, db.ForeignKey('city.id'), nullable=True)
     hire_date = db.Column(db.Date)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     dispatched_requests = db.relationship('Request', backref='dispatcher', lazy='dynamic',
                                           foreign_keys='Request.dispatcher_id')
@@ -189,8 +189,8 @@ class WorkerProfile(db.Model):
     rating = db.Column(db.Float, default=0.0)
     hire_date = db.Column(db.Date)
     about_me = db.Column(db.Text)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     services = db.relationship('Service', secondary=worker_services, backref=db.backref('workers', lazy='dynamic'))
     assigned_requests = db.relationship('Request', backref='worker', lazy='dynamic', foreign_keys='Request.worker_id')
@@ -229,8 +229,8 @@ class Service(db.Model):
     price = db.Column(db.Float, nullable=False)
     duration = db.Column(db.Integer, default=120)
     icon = db.Column(db.String(50), default='bi-droplet-half')
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     requests = db.relationship('Request', backref='service', lazy='dynamic')
 
@@ -261,8 +261,8 @@ class Request(db.Model):
     scheduled_time_end = db.Column(db.Time, nullable=False)
     completed_at = db.Column(db.DateTime)
     rejection_reason = db.Column(db.Text)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), index=True)
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     messages = db.relationship('Message', backref='request', lazy='dynamic', cascade='all, delete-orphan')
     review = db.relationship('Review', backref='request', uselist=False, cascade='all, delete-orphan')
@@ -295,7 +295,7 @@ class Message(db.Model):
     request_id = db.Column(db.Integer, db.ForeignKey('request.id', ondelete='CASCADE'), nullable=False, index=True)
     author_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, index=True)
     content = db.Column(db.Text, nullable=False)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    timestamp = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), index=True)
 
     def __repr__(self):
         return f'<Message #{self.id}>'
@@ -313,7 +313,7 @@ class Review(db.Model):
     comment = db.Column(db.Text)
     photo = db.Column(db.String(200))
     in_portfolio = db.Column(db.Boolean, default=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     def __repr__(self):
         return f'<Review #{self.id} - {self.rating}>'
@@ -330,8 +330,8 @@ class News(db.Model):
     image_filename = db.Column(db.String(100))
     author_id = db.Column(db.Integer, db.ForeignKey('worker_profile.id'), nullable=True)
     is_published = db.Column(db.Boolean, default=True, index=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), index=True)
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     def __repr__(self):
         return f'<News {self.title}>'
